@@ -1,0 +1,206 @@
+---
+import Layout from '../../components/Layout.astro';
+import { getPublishedLayanan, LAYANAN_KATEGORI } from '../../lib/db/layanan';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const layananList = env ? await getPublishedLayanan(env.DB) : [];
+
+// Only offer filter chips for categories that actually have services.
+const usedKategori = LAYANAN_KATEGORI.filter((k) => layananList.some((l) => l.kategori === k));
+const totalCount = layananList.length;
+---
+
+<Layout
+  title="Layanan Administrasi — Desa Sindangsari"
+  description="Daftar layanan administrasi Desa Sindangsari: persyaratan, alur pelayanan, biaya, dan estimasi waktu untuk setiap surat dan dokumen."
+>
+
+<!-- Sticky filter bar -->
+<div id="filterbar" class="sticky top-16 z-30 bg-white border-b border-line shadow-[0_4px_12px_rgba(16,35,26,.08)]">
+  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 py-3">
+    <div class="flex flex-col lg:flex-row lg:items-center gap-3">
+      <div class="relative lg:w-72 shrink-0">
+        <i data-lucide="search" class="w-5 h-5 text-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+        <label for="layanan-search" class="sr-only">Cari layanan berdasarkan nama</label>
+        <input id="layanan-search" type="search" placeholder="Cari layanan…"
+          class="w-full pl-10 pr-3 py-2.5 min-h-[44px] text-base border border-line rounded-lg focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/25" />
+      </div>
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Saring berdasarkan kategori">
+        <button data-cat="semua"
+          class="chip-filter is-active px-3.5 py-2 min-h-[40px] rounded-full text-sm font-heading font-semibold border-2 border-primary bg-primary text-white transition-colors">
+          Semua
+        </button>
+        {usedKategori.map((k) => (
+          <button data-cat={k}
+            class="chip-filter px-3.5 py-2 min-h-[40px] rounded-full text-sm font-heading font-semibold border-2 border-line text-ink hover:border-accent transition-colors">
+            {k}
+          </button>
+        ))}
+      </div>
+      <p id="count" class="text-sm text-muted lg:ml-auto shrink-0" aria-live="polite">
+        Menampilkan {totalCount} layanan
+      </p>
+    </div>
+  </div>
+</div>
+
+<main id="main">
+  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 pt-4 pb-2">
+    <nav aria-label="Breadcrumb" class="text-sm text-muted flex items-center gap-1.5">
+      <a href="/" class="hover:text-accent">Beranda</a>
+      <i data-lucide="chevron-right" class="w-4 h-4"></i>
+      <span class="text-ink font-medium">Layanan Administrasi</span>
+    </nav>
+    <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-2">Layanan Administrasi Desa</h1>
+    <p class="text-muted text-lg mt-2 max-w-2xl">
+      Persyaratan, alur pelayanan, biaya, dan estimasi waktu untuk setiap surat yang diterbitkan Kantor Desa Sindangsari.
+      Siapkan berkas dari rumah agar urusan Anda selesai dalam sekali datang.
+    </p>
+  </div>
+
+  <!-- Jam pelayanan -->
+  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 pt-4">
+    <div class="rounded-xl border border-line bg-sand/50 p-4 flex flex-wrap items-center gap-x-6 gap-y-2">
+      <p class="flex items-center gap-2 text-sm text-ink font-heading font-semibold">
+        <i data-lucide="clock" class="w-4 h-4 text-primary"></i> Jam Pelayanan
+      </p>
+      <p class="text-sm text-muted">Senin–Jumat, 08.00–15.00 WIB</p>
+      <p class="text-sm text-muted">Istirahat 12.00–13.00 WIB · Sabtu, Minggu &amp; hari libur nasional tutup</p>
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 py-6">
+    {layananList.length === 0 ? (
+      <div class="text-center py-20">
+        <div class="w-14 h-14 mx-auto rounded-full bg-sand grid place-items-center">
+          <i data-lucide="file-text" class="w-7 h-7 text-primary"></i>
+        </div>
+        <h2 class="font-heading font-bold text-xl text-ink mt-4">Belum ada layanan dipublikasikan</h2>
+        <p class="text-muted mt-1">Silakan hubungi Kantor Desa untuk informasi pelayanan.</p>
+        <a href="/kontak" class="mt-4 inline-flex items-center gap-2 bg-cta hover:bg-ctaDark text-white font-heading font-semibold px-4 py-2.5 rounded-lg transition-colors min-h-[44px]">
+          <i data-lucide="phone" class="w-4 h-4"></i> Hubungi Kantor Desa
+        </a>
+      </div>
+    ) : (
+      <>
+        <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {layananList.map((l) => (
+            <article
+              class="layanan-card group bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(16,35,26,.08)] hover:shadow-[0_12px_24px_rgba(16,35,26,.12)] hover:border-accent transition-all flex flex-col"
+              data-name={l.nama.toLowerCase()}
+              data-cat={l.kategori}
+            >
+              <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full w-max bg-sand text-primary">
+                {l.kategori}
+              </span>
+
+              <h2 class="font-heading font-bold text-lg text-ink mt-3">
+                <a href={`/layanan/${l.slug}`} class="hover:text-primary focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent rounded">
+                  {l.nama}
+                </a>
+              </h2>
+
+              {l.ringkasan && (
+                <p class="text-sm text-muted mt-1.5 line-clamp-3 flex-1">{l.ringkasan}</p>
+              )}
+
+              <dl class="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted">
+                <div class="flex items-center gap-1.5">
+                  <i data-lucide="wallet" class="w-3.5 h-3.5 text-primary"></i>
+                  <dt class="sr-only">Biaya</dt>
+                  <dd class="font-medium text-ink">{l.biaya}</dd>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <i data-lucide="clock" class="w-3.5 h-3.5 text-primary"></i>
+                  <dt class="sr-only">Estimasi waktu</dt>
+                  <dd>{l.estimasi_waktu}</dd>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <i data-lucide="list-checks" class="w-3.5 h-3.5 text-primary"></i>
+                  <dt class="sr-only">Jumlah persyaratan</dt>
+                  <dd>{l.persyaratan.length} syarat</dd>
+                </div>
+              </dl>
+
+              <a href={`/layanan/${l.slug}`}
+                class="mt-4 inline-flex items-center justify-center gap-2 w-full border-2 border-primary text-primary hover:bg-primary hover:text-white text-sm font-heading font-semibold py-2.5 rounded-lg transition-colors min-h-[44px]">
+                Lihat Syarat &amp; Alur
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </a>
+            </article>
+          ))}
+        </div>
+
+        <div id="empty" class="hidden text-center py-20">
+          <div class="w-14 h-14 mx-auto rounded-full bg-sand grid place-items-center">
+            <i data-lucide="search-x" class="w-7 h-7 text-primary"></i>
+          </div>
+          <h2 class="font-heading font-bold text-xl text-ink mt-4">Layanan tidak ditemukan</h2>
+          <p class="text-muted mt-1">Coba kata kunci lain atau ganti kategori.</p>
+          <button id="reset" class="mt-4 inline-flex items-center gap-2 border-2 border-primary text-primary font-heading font-semibold px-4 py-2.5 rounded-lg hover:bg-primary hover:text-white transition-colors min-h-[44px]">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset filter
+          </button>
+        </div>
+      </>
+    )}
+  </div>
+</main>
+
+</Layout>
+
+<script>
+  const cards = Array.from(document.querySelectorAll('.layanan-card')) as HTMLElement[];
+  const grid = document.getElementById('grid');
+  const countEl = document.getElementById('count');
+  const emptyEl = document.getElementById('empty');
+  const searchEl = document.getElementById('layanan-search') as HTMLInputElement | null;
+
+  let activeCat = 'semua';
+  let query = '';
+
+  function render() {
+    let visible = 0;
+    for (const card of cards) {
+      const matchCat = activeCat === 'semua' || card.dataset.cat === activeCat;
+      const matchQ = !query || (card.dataset.name ?? '').includes(query);
+      const show = matchCat && matchQ;
+      card.classList.toggle('hidden', !show);
+      if (show) visible++;
+    }
+    if (countEl) countEl.textContent = `Menampilkan ${visible} layanan`;
+    emptyEl?.classList.toggle('hidden', visible > 0);
+    grid?.classList.toggle('hidden', visible === 0);
+  }
+
+  function setActiveChip(btn: Element) {
+    document.querySelectorAll('.chip-filter').forEach((b) => {
+      b.classList.remove('is-active', 'bg-primary', 'text-white', 'border-primary');
+      b.classList.add('border-line', 'text-ink');
+    });
+    btn.classList.add('is-active', 'bg-primary', 'text-white', 'border-primary');
+    btn.classList.remove('border-line', 'text-ink');
+  }
+
+  searchEl?.addEventListener('input', (e) => {
+    query = (e.target as HTMLInputElement).value.trim().toLowerCase();
+    render();
+  });
+
+  document.querySelectorAll('.chip-filter').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      setActiveChip(btn);
+      activeCat = (btn as HTMLElement).dataset.cat ?? 'semua';
+      render();
+    });
+  });
+
+  document.getElementById('reset')?.addEventListener('click', () => {
+    activeCat = 'semua';
+    query = '';
+    if (searchEl) searchEl.value = '';
+    const allBtn = document.querySelector('[data-cat="semua"]');
+    if (allBtn) setActiveChip(allBtn);
+    render();
+  });
+</script>

@@ -1,0 +1,91 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { getAllLayanan } from '../../../lib/db/layanan';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const layananList = env ? await getAllLayanan(env.DB) : [];
+const deleted = Astro.url.searchParams.get('deleted');
+---
+
+<AdminLayout title="Kelola Layanan Desa" breadcrumb="Layanan Desa">
+
+  {deleted && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">
+      Layanan berhasil dihapus.
+    </div>
+  )}
+
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">Layanan Administrasi Desa</h2>
+      <p class="text-sm text-text-muted mt-1">Daftar surat &amp; layanan beserta persyaratan dan alur pelayanannya.</p>
+    </div>
+    <a href="/admin/layanan/new"
+      class="px-4 py-2 rounded-lg font-heading font-semibold text-white text-sm focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
+      style="background:var(--color-cta); min-height:44px; display:flex; align-items:center;">
+      + Tambah Layanan Baru
+    </a>
+  </div>
+
+  <div class="bg-white rounded-xl border border-border overflow-hidden" style="box-shadow:var(--shadow-sm);">
+    {layananList.length === 0 ? (
+      <div class="p-8 text-center text-text-muted">Belum ada layanan terdaftar.</div>
+    ) : (
+      <table class="w-full text-sm">
+        <thead style="background:#F8FAFC;">
+          <tr class="border-b border-border">
+            <th class="text-left px-4 py-3 font-heading font-semibold w-14">#</th>
+            <th class="text-left px-4 py-3 font-heading font-semibold">Nama Layanan</th>
+            <th class="text-left px-4 py-3 font-heading font-semibold hidden md:table-cell">Kategori</th>
+            <th class="text-left px-4 py-3 font-heading font-semibold hidden lg:table-cell">Syarat / Langkah</th>
+            <th class="text-left px-4 py-3 font-heading font-semibold hidden md:table-cell">Status</th>
+            <th class="px-4 py-3 font-heading font-semibold">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {layananList.map((l) => (
+            <tr class="border-b border-border last:border-0 hover:bg-sand/30 transition-colors">
+              <td class="px-4 py-3 text-text-muted tabular-nums">{l.urutan}</td>
+              <td class="px-4 py-3 font-medium">{l.nama}</td>
+              <td class="px-4 py-3 hidden md:table-cell">
+                <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-sand" style="color:var(--color-primary);">
+                  {l.kategori}
+                </span>
+              </td>
+              <td class="px-4 py-3 hidden lg:table-cell text-text-muted tabular-nums">
+                {l.persyaratan.length} syarat · {l.alur.length} langkah
+              </td>
+              <td class="px-4 py-3 hidden md:table-cell">
+                <span class:list={['inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium',
+                  l.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600']}>
+                  <span class:list={['w-1.5 h-1.5 rounded-full', l.status === 'published' ? 'bg-green-500' : 'bg-gray-400']} aria-hidden="true"></span>
+                  {l.status === 'published' ? 'Terbit' : 'Draf'}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-center gap-2">
+                  <a href={`/admin/layanan/${l.id}`}
+                    class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border transition-colors hover:bg-primary hover:text-white"
+                    style="border-color:var(--color-primary); color:var(--color-primary);">
+                    Sunting
+                  </a>
+                  <form method="POST" action="/api/admin/layanan/delete"
+                    onsubmit="return confirm('Hapus layanan ini? Tindakan tidak dapat dibatalkan.')">
+                    <input type="hidden" name="id" value={String(l.id)} />
+                    <button type="submit"
+                      class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border cursor-pointer hover:bg-red-50 hover:text-red-600"
+                      style="border-color:#FECACA; color:#DC2626;">
+                      Hapus
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+
+</AdminLayout>

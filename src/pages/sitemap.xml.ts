@@ -8,6 +8,7 @@ export const GET: APIRoute = async ({ locals }) => {
   const staticUrls = [
     { loc: base, priority: '1.0', changefreq: 'weekly' },
     { loc: `${base}/profil`, priority: '0.8', changefreq: 'monthly' },
+    { loc: `${base}/layanan`, priority: '0.9', changefreq: 'monthly' },
     { loc: `${base}/potensi`, priority: '0.8', changefreq: 'monthly' },
     { loc: `${base}/wisata`, priority: '0.9', changefreq: 'weekly' },
     { loc: `${base}/umkm`, priority: '0.9', changefreq: 'weekly' },
@@ -39,6 +40,18 @@ export const GET: APIRoute = async ({ locals }) => {
         priority: '0.7',
         changefreq: 'monthly',
         lastmod: u.updated_at?.split('T')[0],
+      });
+    }
+
+    const layananRows = await env.DB.prepare(
+      "SELECT slug, updated_at FROM layanan WHERE status='published'"
+    ).all<{ slug: string; updated_at: string }>();
+    for (const l of layananRows.results ?? []) {
+      dynamicUrls.push({
+        loc: `${base}/layanan/${l.slug}`,
+        priority: '0.8',
+        changefreq: 'monthly',
+        lastmod: l.updated_at?.split('T')[0],
       });
     }
 

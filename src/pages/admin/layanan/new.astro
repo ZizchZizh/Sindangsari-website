@@ -1,0 +1,21 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import LayananForm from '../../../components/LayananForm.astro';
+
+const error = Astro.url.searchParams.get('error');
+---
+
+<AdminLayout title="Tambah Layanan Baru" breadcrumb="Layanan Desa / Tambah Baru">
+
+  {error && (
+    <div role="alert" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#FEE2E2; color:#991B1B; border:1px solid #FECACA;">
+      Nama, kategori, persyaratan, dan alur pelayanan wajib diisi.
+    </div>
+  )}
+
+  <div class="max-w-3xl">
+    <h2 class="font-heading font-bold text-xl mb-6" style="color:var(--color-primary);">Tambah Layanan Baru</h2>
+    <LayananForm action="/api/admin/layanan" submitLabel="Simpan Layanan" />
+  </div>
+
+</AdminLayout>

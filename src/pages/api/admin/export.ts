@@ -5,13 +5,14 @@ export const GET: APIRoute = async ({ locals }) => {
   const env = getEnv();
   if (!env) return new Response('Unavailable', { status: 503 });
 
-  const [pageSections, wisata, umkm, berita, titikPeta, perangkat, media] = await Promise.all([
+  const [pageSections, wisata, umkm, berita, titikPeta, perangkat, layanan, media] = await Promise.all([
     env.DB.prepare('SELECT * FROM page_section').all(),
     env.DB.prepare('SELECT * FROM wisata').all(),
     env.DB.prepare('SELECT * FROM umkm').all(),
     env.DB.prepare('SELECT * FROM berita').all(),
     env.DB.prepare('SELECT * FROM titik_peta').all(),
     env.DB.prepare('SELECT * FROM perangkat_desa').all(),
+    env.DB.prepare('SELECT * FROM layanan').all(),
     env.DB.prepare('SELECT id, r2_key_display, r2_key_thumb, alt, uploaded_at FROM media').all(),
   ]);
 
@@ -25,6 +26,7 @@ export const GET: APIRoute = async ({ locals }) => {
       berita: berita.results,
       titik_peta: titikPeta.results,
       perangkat_desa: perangkat.results,
+      layanan: layanan.results,
       media: media.results,
     },
   };

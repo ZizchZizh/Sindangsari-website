@@ -1,0 +1,241 @@
+---
+import Layout from '../../components/Layout.astro';
+import { getLayananBySlug, getPublishedLayanan, waRequestLink } from '../../lib/db/layanan';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const { slug } = Astro.params;
+const layanan = env && slug ? await getLayananBySlug(slug, env.DB) : null;
+
+if (!layanan) return Astro.redirect('/404');
+
+const waLink = waRequestLink(layanan);
+
+// "Layanan lainnya" — same category first, then anything else, max 3.
+const semua = await getPublishedLayanan(env!.DB);
+const lainnya = semua
+  .filter((l) => l.slug !== layanan.slug)
+  .sort((a, b) => Number(b.kategori === layanan.kategori) - Number(a.kategori === layanan.kategori))
+  .slice(0, 3);
+
+// HowTo structured data — lets the procedure surface directly in search results.
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: `Cara Mengurus ${layanan.nama} di Desa Sindangsari`,
+  description: layanan.ringkasan,
+  totalTime: layanan.estimasi_waktu,
+  estimatedCost: layanan.biaya,
+  supply: layanan.persyaratan.map((p) => ({ '@type': 'HowToSupply', name: p })),
+  step: layanan.alur.map((s, i) => ({
+    '@type': 'HowToStep',
+    position: i + 1,
+    name: s.judul,
+    text: s.keterangan || s.judul,
+  })),
+};
+
+const ketentuan = [
+  { icon: 'wallet', label: 'Biaya', value: layanan.biaya },
+  { icon: 'clock', label: 'Estimasi Waktu', value: layanan.estimasi_waktu },
+  { icon: 'user-check', label: 'Penanggung Jawab', value: layanan.penanggung_jawab },
+  { icon: 'scale', label: 'Dasar Hukum', value: layanan.dasar_hukum },
+].filter((k) => k.value);
+---
+
+<Layout
+  title={`${layanan.nama} — Layanan Desa Sindangsari`}
+  description={layanan.ringkasan || `Persyaratan dan alur pelayanan ${layanan.nama} di Desa Sindangsari.`}
+>
+
+<script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
+
+<main id="main">
+
+  <!-- ── Header ── -->
+  <div class="bg-sand/40 border-b border-line">
+    <div class="mx-auto max-w-[1152px] px-4 sm:px-6 pt-6 pb-8">
+      <nav aria-label="Breadcrumb" class="text-sm text-muted flex flex-wrap items-center gap-1.5">
+        <a href="/" class="hover:text-accent">Beranda</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <a href="/layanan" class="hover:text-accent">Layanan</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <span class="text-ink font-medium">{layanan.nama}</span>
+      </nav>
+
+      <span class="inline-flex mt-4 text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-white text-primary border border-line">
+        {layanan.kategori}
+      </span>
+
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-3">{layanan.nama}</h1>
+
+      {layanan.ringkasan && (
+        <p class="text-muted text-lg mt-3 max-w-3xl">{layanan.ringkasan}</p>
+      )}
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 py-8">
+    <div class="grid lg:grid-cols-3 gap-8">
+
+      <!-- ── Kolom utama: persyaratan + alur ── -->
+      <div class="lg:col-span-2 space-y-8">
+
+        <!-- Persyaratan -->
+        <section aria-labelledby="h-syarat">
+          <h2 id="h-syarat" class="font-heading font-bold text-xl text-primary flex items-center gap-2">
+            <i data-lucide="list-checks" class="w-5 h-5"></i>
+            Persyaratan
+          </h2>
+          <p class="text-sm text-muted mt-1">Siapkan seluruh berkas berikut sebelum datang ke Kantor Desa.</p>
+
+          <ul class="mt-4 space-y-2.5">
+            {layanan.persyaratan.map((syarat) => (
+              <li class="flex items-start gap-3 bg-white border border-line rounded-lg p-3.5">
+                <i data-lucide="check" class="w-5 h-5 text-accent shrink-0 mt-0.5"></i>
+                <span class="text-ink">{syarat}</span>
+              </li>
+            ))}
+          </ul>
+
+          {layanan.form_url && (
+            <a href={layanan.form_url} target="_blank" rel="noopener noreferrer"
+              class="mt-4 inline-flex items-center gap-2 border-2 border-primary text-primary hover:bg-primary hover:text-white font-heading font-semibold px-4 py-2.5 rounded-lg transition-colors min-h-[44px]">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              Unduh Formulir
+            </a>
+          )}
+        </section>
+
+        <!-- Alur pelayanan -->
+        <section aria-labelledby="h-alur">
+          <h2 id="h-alur" class="font-heading font-bold text-xl text-primary flex items-center gap-2">
+            <i data-lucide="route" class="w-5 h-5"></i>
+            Alur Pelayanan
+          </h2>
+          <p class="text-sm text-muted mt-1">Ikuti langkah berikut secara berurutan.</p>
+
+          <ol class="mt-5 relative">
+            {layanan.alur.map((langkah, i) => (
+              <li class="relative flex gap-4 pb-6 last:pb-0">
+                <!-- Connector line -->
+                {i < layanan.alur.length - 1 && (
+                  <span class="absolute left-[19px] top-11 bottom-0 w-0.5 bg-line" aria-hidden="true"></span>
+                )}
+
+                <span
+                  class="relative z-10 w-10 h-10 shrink-0 rounded-full grid place-items-center font-heading font-bold text-white bg-primary"
+                  aria-hidden="true"
+                >
+                  {i + 1}
+                </span>
+
+                <div class="flex-1 bg-white border border-line rounded-xl p-4 shadow-[0_2px_6px_rgba(16,35,26,.05)]">
+                  <h3 class="font-heading font-semibold text-ink">
+                    <span class="sr-only">Langkah {i + 1}: </span>{langkah.judul}
+                  </h3>
+                  {langkah.keterangan && (
+                    <p class="text-sm text-muted mt-1">{langkah.keterangan}</p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+      </div>
+
+      <!-- ── Sidebar: ketentuan + pengajuan ── -->
+      <aside class="lg:col-span-1">
+        <div class="lg:sticky lg:top-24 space-y-5">
+
+          <!-- Ketentuan -->
+          <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(16,35,26,.08)]">
+            <h2 class="font-heading font-bold text-ink">Ketentuan Pelayanan</h2>
+            <dl class="mt-4 space-y-4">
+              {ketentuan.map(({ icon, label, value }) => (
+                <div class="flex items-start gap-3">
+                  <i data-lucide={icon} class="w-4 h-4 text-primary shrink-0 mt-1"></i>
+                  <div>
+                    <dt class="text-xs text-muted">{label}</dt>
+                    <dd class="text-sm font-medium text-ink mt-0.5">{value}</dd>
+                  </div>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <!-- Pengajuan -->
+          <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(16,35,26,.08)]">
+            <h2 class="font-heading font-bold text-ink">Ajukan Layanan</h2>
+            <p class="text-sm text-muted mt-1">
+              Tanyakan kesiapan berkas Anda lebih dulu lewat WhatsApp, atau datang langsung ke Kantor Desa
+              pada jam pelayanan.
+            </p>
+
+            {waLink ? (
+              <a href={waLink} target="_blank" rel="noopener noreferrer"
+                class="mt-4 inline-flex items-center justify-center gap-2 w-full bg-cta hover:bg-ctaDark text-white font-heading font-semibold py-2.5 rounded-lg transition-colors min-h-[44px]">
+                <i data-lucide="message-circle" class="w-4 h-4"></i>
+                Ajukan via WhatsApp
+              </a>
+            ) : (
+              <a href="/kontak"
+                class="mt-4 inline-flex items-center justify-center gap-2 w-full bg-cta hover:bg-ctaDark text-white font-heading font-semibold py-2.5 rounded-lg transition-colors min-h-[44px]">
+                <i data-lucide="phone" class="w-4 h-4"></i>
+                Hubungi Kantor Desa
+              </a>
+            )}
+
+            <div class="mt-4 pt-4 border-t border-line">
+              <p class="text-xs text-muted flex items-start gap-2">
+                <i data-lucide="clock" class="w-3.5 h-3.5 text-primary shrink-0 mt-0.5"></i>
+                <span>
+                  <strong class="text-ink font-heading">Jam pelayanan:</strong><br />
+                  Senin–Jumat, 08.00–15.00 WIB<br />
+                  Istirahat 12.00–13.00 WIB
+                </span>
+              </p>
+            </div>
+
+            <p class="text-xs text-muted mt-4 pt-4 border-t border-line flex items-start gap-2">
+              <i data-lucide="info" class="w-3.5 h-3.5 text-primary shrink-0 mt-0.5"></i>
+              <span>Seluruh layanan administrasi di Kantor Desa <strong class="text-ink">tidak dipungut biaya</strong>, kecuali disebutkan lain. Laporkan bila ada pungutan di luar ketentuan.</span>
+            </p>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- ── Layanan lainnya ── -->
+    {lainnya.length > 0 && (
+      <section aria-labelledby="h-lainnya" class="mt-12 pt-8 border-t border-line">
+        <h2 id="h-lainnya" class="font-heading font-bold text-xl text-primary">Layanan Lainnya</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
+          {lainnya.map((l) => (
+            <a href={`/layanan/${l.slug}`}
+              class="group bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(16,35,26,.08)] hover:shadow-[0_12px_24px_rgba(16,35,26,.12)] hover:border-accent transition-all block">
+              <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-sand text-primary">
+                {l.kategori}
+              </span>
+              <h3 class="font-heading font-semibold text-ink mt-3 group-hover:text-primary">{l.nama}</h3>
+              <p class="text-xs text-muted mt-1.5">{l.persyaratan.length} syarat · {l.estimasi_waktu}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <div class="mt-10">
+      <a href="/layanan" class="inline-flex items-center gap-2 text-sm font-heading font-semibold text-accent hover:underline">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Kembali ke semua layanan
+      </a>
+    </div>
+
+  </div>
+</main>
+
+</Layout>

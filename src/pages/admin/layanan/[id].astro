@@ -1,0 +1,48 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import LayananForm from '../../../components/LayananForm.astro';
+import { getLayananById } from '../../../lib/db/layanan';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const id = Number(Astro.params.id);
+const layanan = env && id ? await getLayananById(id, env.DB) : null;
+
+if (!layanan) return Astro.redirect('/admin/layanan');
+
+const saved = Astro.url.searchParams.get('saved');
+const error = Astro.url.searchParams.get('error');
+---
+
+<AdminLayout title={`Sunting ${layanan.nama}`} breadcrumb="Layanan Desa / Sunting">
+
+  {saved && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">
+      Perubahan berhasil disimpan.
+    </div>
+  )}
+
+  {error && (
+    <div role="alert" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#FEE2E2; color:#991B1B; border:1px solid #FECACA;">
+      Nama, kategori, persyaratan, dan alur pelayanan wajib diisi.
+    </div>
+  )}
+
+  <div class="max-w-3xl">
+    <div class="flex items-start justify-between gap-4 mb-6">
+      <div>
+        <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">Sunting Layanan</h2>
+        <p class="text-sm text-text-muted mt-1">/layanan/{layanan.slug}</p>
+      </div>
+      {layanan.status === 'published' && (
+        <a href={`/layanan/${layanan.slug}`} target="_blank" rel="noopener"
+          class="text-sm font-heading font-medium text-accent hover:underline shrink-0 mt-1">
+          Lihat di situs ↗
+        </a>
+      )}
+    </div>
+
+    <LayananForm layanan={layanan} action={`/api/admin/layanan/${layanan.id}`} submitLabel="Simpan Perubahan" />
+  </div>
+
+</AdminLayout>

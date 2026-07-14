@@ -1,0 +1,195 @@
+---
+import {
+  LAYANAN_KATEGORI,
+  ALUR_SEPARATOR,
+  formatPersyaratanText,
+  formatAlurText,
+  type Layanan,
+} from '../lib/db/layanan';
+
+interface Props {
+  /** Omit for the "create" form; pass the record to edit it. */
+  layanan?: Layanan;
+  action: string;
+  submitLabel?: string;
+  cancelHref?: string;
+}
+
+const {
+  layanan,
+  action,
+  submitLabel = 'Simpan',
+  cancelHref = '/admin/layanan',
+} = Astro.props;
+
+const v = {
+  nama: layanan?.nama ?? '',
+  kategori: layanan?.kategori ?? LAYANAN_KATEGORI[0],
+  ringkasan: layanan?.ringkasan ?? '',
+  persyaratan: layanan ? formatPersyaratanText(layanan.persyaratan) : '',
+  alur: layanan ? formatAlurText(layanan.alur) : '',
+  biaya: layanan?.biaya ?? 'Gratis',
+  estimasi_waktu: layanan?.estimasi_waktu ?? '1–2 hari kerja',
+  dasar_hukum: layanan?.dasar_hukum ?? '',
+  penanggung_jawab: layanan?.penanggung_jawab ?? '',
+  wa_number: layanan?.wa_number ?? '',
+  form_url: layanan?.form_url ?? '',
+  urutan: String(layanan?.urutan ?? 0),
+  status: layanan?.status ?? 'draft',
+};
+
+const inputClass = 'w-full rounded-lg border px-4 py-3 text-base focus:outline-none';
+const inputStyle = 'border-color:var(--color-border); min-height:44px;';
+
+const alurPlaceholder = [
+  `Minta pengantar RT/RW ${ALUR_SEPARATOR} Datangi Ketua RT lalu RW setempat.`,
+  `Datang ke Kantor Desa ${ALUR_SEPARATOR} Bawa berkas persyaratan lengkap.`,
+  `Surat diserahkan ${ALUR_SEPARATOR} Surat dapat diambil di loket pelayanan.`,
+].join('\n');
+---
+
+<form method="POST" action={action} class="space-y-5">
+
+  <!-- ── Identitas layanan ── -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div>
+      <label for="nama" class="block font-heading font-medium text-sm mb-1.5">
+        Nama Layanan <span>*</span> <span class="font-normal text-text-muted">(wajib)</span>
+      </label>
+      <input type="text" id="nama" name="nama" required value={v.nama}
+        class={inputClass} style={inputStyle}
+        placeholder="cth. Surat Keterangan Domisili" />
+    </div>
+    <div>
+      <label for="kategori" class="block font-heading font-medium text-sm mb-1.5">
+        Kategori <span>*</span> <span class="font-normal text-text-muted">(wajib)</span>
+      </label>
+      <select id="kategori" name="kategori" required class={inputClass} style={inputStyle}>
+        {LAYANAN_KATEGORI.map((k) => (
+          <option value={k} selected={k === v.kategori}>{k}</option>
+        ))}
+      </select>
+    </div>
+  </div>
+
+  <div>
+    <label for="ringkasan" class="block font-heading font-medium text-sm mb-1.5">Ringkasan</label>
+    <textarea id="ringkasan" name="ringkasan" rows="3"
+      class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+      style="border-color:var(--color-border);"
+      placeholder="Penjelasan singkat: surat ini untuk apa dan biasanya dipakai untuk keperluan apa.">{v.ringkasan}</textarea>
+    <p class="text-xs text-text-muted mt-1">Tampil di kartu daftar layanan dan di bagian atas halaman detail.</p>
+  </div>
+
+  <!-- ── Persyaratan ── -->
+  <fieldset class="border border-border rounded-xl p-4">
+    <legend class="font-heading font-semibold text-sm px-2" style="color:var(--color-primary);">
+      Persyaratan <span>*</span>
+    </legend>
+    <p class="text-xs text-text-muted mb-3">
+      Tulis <strong>satu syarat per baris</strong>. Setiap baris akan tampil sebagai satu poin ceklis di situs.
+    </p>
+    <textarea id="persyaratan" name="persyaratan" rows="6" required
+      class="w-full rounded-lg border px-4 py-3 text-base font-mono focus:outline-none"
+      style="border-color:var(--color-border);"
+      placeholder={'Surat pengantar RT/RW\nFotokopi KTP pemohon\nFotokopi Kartu Keluarga'}>{v.persyaratan}</textarea>
+  </fieldset>
+
+  <!-- ── Alur / prosedur ── -->
+  <fieldset class="border border-border rounded-xl p-4">
+    <legend class="font-heading font-semibold text-sm px-2" style="color:var(--color-primary);">
+      Alur Pelayanan <span>*</span>
+    </legend>
+    <p class="text-xs text-text-muted mb-3">
+      Tulis <strong>satu langkah per baris</strong>, urut dari awal sampai selesai. Pisahkan judul langkah
+      dan penjelasannya dengan <code class="px-1 py-0.5 rounded bg-sand font-mono">{ALUR_SEPARATOR}</code>.
+      Penjelasan boleh dikosongkan. Nomor langkah dibuat otomatis.
+    </p>
+    <textarea id="alur" name="alur" rows="7" required
+      class="w-full rounded-lg border px-4 py-3 text-base font-mono focus:outline-none"
+      style="border-color:var(--color-border);"
+      placeholder={alurPlaceholder}>{v.alur}</textarea>
+  </fieldset>
+
+  <!-- ── Ketentuan pelayanan ── -->
+  <fieldset class="border border-border rounded-xl p-4">
+    <legend class="font-heading font-semibold text-sm px-2" style="color:var(--color-primary);">Ketentuan Pelayanan</legend>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label for="biaya" class="block font-heading font-medium text-sm mb-1">Biaya</label>
+        <input type="text" id="biaya" name="biaya" value={v.biaya}
+          class={inputClass} style={inputStyle} placeholder="cth. Gratis" />
+      </div>
+      <div>
+        <label for="estimasi_waktu" class="block font-heading font-medium text-sm mb-1">Estimasi Waktu</label>
+        <input type="text" id="estimasi_waktu" name="estimasi_waktu" value={v.estimasi_waktu}
+          class={inputClass} style={inputStyle} placeholder="cth. 1–2 hari kerja" />
+      </div>
+      <div>
+        <label for="penanggung_jawab" class="block font-heading font-medium text-sm mb-1">Penanggung Jawab</label>
+        <input type="text" id="penanggung_jawab" name="penanggung_jawab" value={v.penanggung_jawab}
+          class={inputClass} style={inputStyle} placeholder="cth. Kasi Pelayanan" />
+      </div>
+      <div>
+        <label for="dasar_hukum" class="block font-heading font-medium text-sm mb-1">Dasar Hukum</label>
+        <input type="text" id="dasar_hukum" name="dasar_hukum" value={v.dasar_hukum}
+          class={inputClass} style={inputStyle} placeholder="cth. Permendagri No. 2 Tahun 2017" />
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- ── Pengajuan ── -->
+  <fieldset class="border border-border rounded-xl p-4">
+    <legend class="font-heading font-semibold text-sm px-2" style="color:var(--color-primary);">Pengajuan &amp; Formulir</legend>
+    <p class="text-xs text-text-muted mb-4">
+      Kolom kosong tidak akan ditampilkan di situs. Tanpa nomor WhatsApp, warga diarahkan ke halaman Kontak.
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label for="wa_number" class="block font-heading font-medium text-sm mb-1">Nomor WhatsApp Pelayanan</label>
+        <input type="tel" id="wa_number" name="wa_number" value={v.wa_number}
+          class={inputClass} style={inputStyle} placeholder="cth. 6281234567890" />
+        <p class="text-xs text-text-muted mt-1">Format 62… (tanpa spasi, tanpa tanda +).</p>
+      </div>
+      <div>
+        <label for="form_url" class="block font-heading font-medium text-sm mb-1">Tautan Unduh Formulir</label>
+        <input type="url" id="form_url" name="form_url" value={v.form_url}
+          class={inputClass} style={inputStyle} placeholder="https://drive.google.com/..." />
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- ── Publikasi ── -->
+  <div class="flex flex-wrap gap-5">
+    <div>
+      <label for="urutan" class="block font-heading font-medium text-sm mb-1.5">Urutan Tampil</label>
+      <input type="number" id="urutan" name="urutan" value={v.urutan} min="0" step="1"
+        class="rounded-lg border px-4 py-3 text-base focus:outline-none"
+        style="border-color:var(--color-border); min-height:44px; width:120px;" />
+      <p class="text-xs text-text-muted mt-1">Angka kecil tampil lebih dulu.</p>
+    </div>
+    <div>
+      <label for="status" class="block font-heading font-medium text-sm mb-1.5">Status</label>
+      <select id="status" name="status"
+        class="rounded-lg border px-4 py-3 text-base focus:outline-none"
+        style="border-color:var(--color-border); min-height:44px; min-width:160px;">
+        <option value="draft" selected={v.status === 'draft'}>Draf</option>
+        <option value="published" selected={v.status === 'published'}>Terbitkan</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="sticky bottom-0 bg-white border-t border-border -mx-4 md:-mx-6 px-4 md:px-6 py-3 flex justify-end gap-3" style="box-shadow:0 -2px 8px rgba(0,0,0,.06);">
+    <a href={cancelHref}
+      class="px-4 py-2 rounded-lg font-heading font-medium text-sm border hover:bg-sand"
+      style="border-color:var(--color-border); min-height:44px; display:flex; align-items:center;">
+      Batal
+    </a>
+    <button type="submit"
+      class="px-5 py-2 rounded-lg font-heading font-semibold text-white text-sm cursor-pointer"
+      style="background:var(--color-cta); min-height:44px;">
+      {submitLabel}
+    </button>
+  </div>
+
+</form>

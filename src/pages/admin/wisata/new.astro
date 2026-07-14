@@ -76,7 +76,13 @@ const error = Astro.url.searchParams.get('error');
 <script>
   const editor = document.getElementById('editor-deskripsi') as HTMLDivElement;
   const hidden = document.getElementById('deskripsi_html') as HTMLInputElement;
-  document.querySelector('form')?.addEventListener('submit', (e) => {
+  // PENTING: JANGAN pakai document.querySelector('form') di sini.
+  // AdminLayout merender form Logout di sidebar, dan sidebar berada SEBELUM
+  // konten di DOM — jadi querySelector('form') mengambil form Logout, bukan
+  // form ini. Akibatnya isi editor tidak pernah tersalin ke hidden input:
+  // halaman Tambah menyimpan deskripsi KOSONG, halaman Sunting menyimpan teks
+  // LAMA. Ikat selalu ke form yang memuat editornya sendiri.
+  hidden.closest('form')?.addEventListener('submit', (e) => {
     const nama = (document.getElementById('nama') as HTMLInputElement).value.trim();
     if (!nama) {
       e.preventDefault();

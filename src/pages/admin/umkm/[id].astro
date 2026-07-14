@@ -129,7 +129,13 @@ const categories = ['Kuliner', 'Kriya', 'Jasa', 'Hasil Tani'];
 <script>
   const editor = document.getElementById('editor') as HTMLDivElement;
   const hidden = document.getElementById('deskripsi_html') as HTMLInputElement;
-  document.querySelector('form')?.addEventListener('submit', () => { hidden.value = editor.innerHTML; });
+  // PENTING: JANGAN pakai document.querySelector('form') di sini.
+  // AdminLayout merender form Logout di sidebar, dan sidebar berada SEBELUM
+  // konten di DOM — jadi querySelector('form') mengambil form Logout, bukan
+  // form ini. Akibatnya isi editor tidak pernah tersalin ke hidden input:
+  // halaman Tambah menyimpan deskripsi KOSONG, halaman Sunting menyimpan teks
+  // LAMA. Ikat selalu ke form yang memuat editornya sendiri.
+  hidden.closest('form')?.addEventListener('submit', () => { hidden.value = editor.innerHTML; });
   document.querySelectorAll('[data-cmd]').forEach(btn => {
     btn.addEventListener('click', () => { editor.focus(); document.execCommand((btn as HTMLElement).dataset.cmd ?? '', false); });
   });

@@ -1,0 +1,159 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { getPerangkatDesa, JABATAN_UMUM } from '../../../lib/db/perangkat-desa';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const perangkat = env ? await getPerangkatDesa(env.DB) : [];
+
+const saved = Astro.url.searchParams.get('saved');
+const deleted = Astro.url.searchParams.get('deleted');
+const error = Astro.url.searchParams.get('error');
+
+// Urutan berikutnya diusulkan otomatis agar admin tidak perlu menebak.
+const urutanBerikutnya = perangkat.length > 0
+  ? Math.max(...perangkat.map(p => p.urutan)) + 1
+  : 1;
+
+const belumDiisi = perangkat.filter(p => p.nama.includes('Segera Diisi')).length;
+---
+
+<AdminLayout title="Perangkat Desa" breadcrumb="Perangkat Desa">
+
+  {saved && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">
+      Perubahan berhasil disimpan.
+    </div>
+  )}
+  {deleted && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">
+      Perangkat desa berhasil dihapus.
+    </div>
+  )}
+  {error && (
+    <div role="alert" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#FEE2E2; color:#991B1B; border:1px solid #FECACA;">
+      Nama dan jabatan wajib diisi.
+    </div>
+  )}
+
+  {belumDiisi > 0 && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm" style="background:#FEF3C7; color:#92400E; border:1px solid #FCD34D;">
+      <strong>{belumDiisi} perangkat masih bernama "(Segera Diisi)"</strong> dan nama itu tampil di
+      halaman publik <a href="/pemerintahan" target="_blank" rel="noopener" class="underline">/pemerintahan</a>.
+      Sunting namanya agar tidak terlihat kosong oleh warga.
+    </div>
+  )}
+
+  <div class="mb-6">
+    <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">Struktur Organisasi</h2>
+    <p class="text-sm text-text-muted mt-1">
+      Nama dan jabatan perangkat desa yang tampil di halaman Pemerintahan.
+    </p>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-[1.6fr_1fr] items-start">
+
+    <!-- ── Daftar perangkat ── -->
+    <div class="bg-white rounded-xl border border-border overflow-hidden" style="box-shadow:var(--shadow-sm);">
+      {perangkat.length === 0 ? (
+        <div class="p-8 text-center text-text-muted">Belum ada perangkat desa terdaftar.</div>
+      ) : (
+        <table class="w-full text-sm">
+          <thead style="background:#F8FAFC;">
+            <tr class="border-b border-border">
+              <th class="text-left px-4 py-3 font-heading font-semibold w-14">#</th>
+              <th class="text-left px-4 py-3 font-heading font-semibold">Nama</th>
+              <th class="text-left px-4 py-3 font-heading font-semibold hidden md:table-cell">Jabatan</th>
+              <th class="px-4 py-3 font-heading font-semibold">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {perangkat.map((p) => (
+              <tr class="border-b border-border last:border-0 hover:bg-sand/30 transition-colors">
+                <td class="px-4 py-3 text-text-muted tabular-nums">{p.urutan}</td>
+                <td class="px-4 py-3 font-medium">
+                  {p.nama.includes('Segera Diisi') ? (
+                    <span style="color:#B45309;">{p.nama}</span>
+                  ) : p.nama}
+                </td>
+                <td class="px-4 py-3 hidden md:table-cell">
+                  <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-sand" style="color:var(--color-primary);">
+                    {p.jabatan}
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center justify-center gap-2">
+                    <a href={`/admin/perangkat/${p.id}`}
+                      class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border transition-colors hover:bg-primary hover:text-white"
+                      style="border-color:var(--color-primary); color:var(--color-primary);">
+                      Sunting
+                    </a>
+                    <form method="POST" action="/api/admin/perangkat/delete"
+                      onsubmit="return confirm('Hapus perangkat ini? Tindakan tidak dapat dibatalkan.')">
+                      <input type="hidden" name="id" value={String(p.id)} />
+                      <button type="submit"
+                        class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border cursor-pointer hover:bg-red-50 hover:text-red-600"
+                        style="border-color:#FECACA; color:#DC2626;">
+                        Hapus
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+
+    <!-- ── Tambah perangkat ── -->
+    <div class="bg-white rounded-xl border border-border p-5" style="box-shadow:var(--shadow-sm);">
+      <h3 class="font-heading font-semibold" style="color:var(--color-primary);">Tambah Perangkat</h3>
+
+      <form method="POST" action="/api/admin/perangkat" class="space-y-4 mt-4">
+        <div>
+          <label for="nama" class="block font-heading font-medium text-sm mb-1.5">
+            Nama <span>*</span>
+          </label>
+          <input type="text" id="nama" name="nama" required
+            class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+            style="border-color:var(--color-border); min-height:44px;"
+            placeholder="cth. Vovi Pathul Hidayat" />
+        </div>
+
+        <div>
+          <label for="jabatan" class="block font-heading font-medium text-sm mb-1.5">
+            Jabatan <span>*</span>
+          </label>
+          <input type="text" id="jabatan" name="jabatan" required list="daftar-jabatan"
+            class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+            style="border-color:var(--color-border); min-height:44px;"
+            placeholder="cth. Kasi Pelayanan" />
+          <datalist id="daftar-jabatan">
+            {JABATAN_UMUM.map((j) => <option value={j}></option>)}
+          </datalist>
+          <p class="text-xs text-text-muted mt-1">
+            Boleh diketik bebas. Jabatan yang mengandung <strong>"Kepala Desa"</strong> tampil di puncak
+            bagan, <strong>"Sekretaris"</strong> di tingkat kedua, sisanya di grid bawah.
+          </p>
+        </div>
+
+        <div>
+          <label for="urutan" class="block font-heading font-medium text-sm mb-1.5">Urutan Tampil</label>
+          <input type="number" id="urutan" name="urutan" min="0" step="1" value={String(urutanBerikutnya)}
+            class="rounded-lg border px-4 py-3 text-base focus:outline-none"
+            style="border-color:var(--color-border); min-height:44px; width:120px;" />
+          <p class="text-xs text-text-muted mt-1">Angka kecil tampil lebih dulu.</p>
+        </div>
+
+        <button type="submit"
+          class="w-full px-5 py-2 rounded-lg font-heading font-semibold text-white text-sm cursor-pointer"
+          style="background:var(--color-cta); min-height:44px;">
+          Tambah Perangkat
+        </button>
+      </form>
+    </div>
+
+  </div>
+
+</AdminLayout>

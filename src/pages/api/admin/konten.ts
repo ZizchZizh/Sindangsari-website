@@ -1,6 +1,6 @@
 import { getEnv } from '@lib/env';
 import type { APIRoute } from 'astro';
-import { upsertSection } from '../../../lib/db/page-section';
+import { upsertSection, kontenCachePaths } from '../../../lib/db/page-section';
 import { purgeCache } from '../../../lib/cache/purge';
 
 export const POST: APIRoute = async ({ request, locals, redirect }) => {
@@ -16,9 +16,11 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
 
   await upsertSection(slug, { title, content_html }, env.DB);
 
-  // Purge relevant public cache paths
-  const purgePaths = ['/', '/profil', '/potensi'];
-  await purgeCache(purgePaths);
+  // Purge halaman yang benar-benar membaca section ini.
+  // Sebelumnya daftar ini di-hardcode ke ['/', '/profil', '/potensi'], sehingga
+  // menyunting `pemerintahan-*` TIDAK PERNAH mem-purge /pemerintahan — perubahan
+  // bisa tertahan di cache. Sekarang path diturunkan dari slug-nya.
+  await purgeCache(kontenCachePaths(slug));
 
   return redirect(`/admin/konten/${slug}?saved=1`);
 };

@@ -184,7 +184,8 @@ const demoStaff = [
         <span class="inline-flex items-center gap-2 text-white/80 font-heading font-semibold">
           <i data-lucide="target" class="w-5 h-5"></i> Visi
         </span>
-        <p class="text-xl font-heading font-semibold mt-3 leading-snug" set:html={visiMisi?.content_html ?? '"Terwujudnya Desa Sindangsari yang Maju, Mandiri, dan Sejahtera Berbasis Potensi Lokal dan Kearifan Budaya Sunda."'} />
+        <!-- <div>, bukan <p>: content_html dari CMS bisa berisi <h2>/<ol>, yang tidak valid di dalam <p>. -->
+        <div class="text-xl font-heading font-semibold mt-3 leading-snug" set:html={visiMisi?.content_html ?? '"Terwujudnya Desa Sindangsari yang Maju, Mandiri, dan Sejahtera Berbasis Potensi Lokal dan Kearifan Budaya Sunda."'} />
       </div>
       <div class="bg-white border border-line rounded-2xl p-7">
         <span class="inline-flex items-center gap-2 text-primary font-heading font-semibold">
@@ -210,7 +211,7 @@ const demoStaff = [
   <!-- Ruang Lingkup -->
   <section id="ruang-lingkup" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Ruang Lingkup</h2>
-    <p class="text-muted mt-2 max-w-3xl leading-relaxed" set:html={ruangLingkup?.content_html ?? 'Bagian ini menjelaskan cakupan wilayah administratif Desa Sindangsari, jumlah dusun/RW/RT, serta lingkup kewenangan dan layanan yang diselenggarakan pemerintah desa bagi masyarakat.'} />
+    <div class="text-muted mt-2 max-w-3xl leading-relaxed" set:html={ruangLingkup?.content_html ?? 'Bagian ini menjelaskan cakupan wilayah administratif Desa Sindangsari, jumlah dusun/RW/RT, serta lingkup kewenangan dan layanan yang diselenggarakan pemerintah desa bagi masyarakat.'} />
     <div class="grid sm:grid-cols-3 gap-4 mt-4">
       {[
         { icon: 'layers', label: 'Dusun', value: '3' },
@@ -229,7 +230,9 @@ const demoStaff = [
   <!-- Tugas & Fungsi -->
   <section id="tugas-fungsi" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Tugas & Fungsi</h2>
-    <p class="text-muted mt-2 max-w-2xl">Peran masing-masing perangkat dalam penyelenggaraan pemerintahan desa.</p>
+    <!-- Section `pemerintahan-tugas-fungsi` sebelumnya di-fetch tapi TIDAK PERNAH dirender —
+         admin bisa menyuntingnya tanpa efek apa pun. Sekarang tersambung. -->
+    <div class="text-muted mt-2 max-w-3xl leading-relaxed" set:html={tugasFungsi?.content_html ?? 'Peran masing-masing perangkat dalam penyelenggaraan pemerintahan desa.'} />
     <div class="grid sm:grid-cols-2 gap-4 mt-4">
       {[
         { icon: 'user-round', title: 'Kepala Desa', desc: 'Memimpin penyelenggaraan pemerintahan, pembangunan, dan pemberdayaan masyarakat desa.' },

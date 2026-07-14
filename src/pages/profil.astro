@@ -12,20 +12,20 @@ const [umum, geografis, sejarah] = await Promise.all([
 ---
 
 <Layout
-  title="Profil Desa — Desa Loji"
-  description="Profil lengkap Desa Loji: sejarah, kondisi geografis, visi misi, dan gambaran desa pesisir Kecamatan Simpenan Sukabumi."
+  title="Profil Desa — Desa Sindangsari"
+  description="Profil lengkap Desa Sindangsari: sejarah, kondisi geografis, visi misi, dan gambaran desa dataran tinggi Kecamatan Kasomalang Subang."
 >
 
 <!-- Hero -->
 <section class="relative">
   <div class="h-48 sm:h-64 overflow-hidden">
     <img
-      src="/images/pantai_loji.png"
-      alt="Pantai dan alam Desa Loji"
+      src="/images/hero_sindangsari.png"
+      alt="Alam dan perbukitan Desa Sindangsari"
       class="w-full h-full object-cover"
     />
   </div>
-  <div class="absolute inset-0" style="background: rgba(10,54,80,0.6);"></div>
+  <div class="absolute inset-0" style="background: rgba(20,83,45,0.6);"></div>
   <div class="absolute inset-0 flex items-end">
     <div class="mx-auto max-w-[1152px] px-4 sm:px-6 w-full pb-6 text-white">
       <nav aria-label="Breadcrumb" class="text-sm text-white/80 flex items-center gap-1.5">
@@ -33,8 +33,8 @@ const [umum, geografis, sejarah] = await Promise.all([
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
         <span class="font-medium">Profil Desa</span>
       </nav>
-      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Profil Desa Loji</h1>
-      <p class="text-white/85 mt-1 max-w-xl">Kecamatan Simpenan, Kabupaten Sukabumi, Jawa Barat</p>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Profil Desa Sindangsari</h1>
+      <p class="text-white/85 mt-1 max-w-xl">Kecamatan Kasomalang, Kabupaten Subang, Jawa Barat</p>
     </div>
   </div>
 </section>
@@ -64,12 +64,12 @@ const [umum, geografis, sejarah] = await Promise.all([
   <!-- Stats -->
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
     {[
-      { icon: 'users', label: 'Penduduk', value: '±4.500', sub: 'Jiwa' },
-      { icon: 'layers', label: 'Wilayah', value: '±2.500', sub: 'Hektar' },
-      { icon: 'home', label: 'Dusun', value: '5', sub: 'Wilayah' },
-      { icon: 'store', label: 'UMKM', value: '12+', sub: 'Terdaftar' },
+      { icon: 'users', label: 'Penduduk', value: '±7.600', sub: 'Jiwa' },
+      { icon: 'layers', label: 'Wilayah', value: '±305', sub: 'Hektar' },
+      { icon: 'home', label: 'Dusun', value: '3', sub: 'Wilayah' },
+      { icon: 'store', label: 'UMKM', value: '10+', sub: 'Terdaftar' },
     ].map(s => (
-      <div class="bg-white border border-line rounded-2xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+      <div class="bg-white border border-line rounded-2xl p-5 shadow-[0_4px_10px_rgba(16,35,26,.08)]">
         <i data-lucide={s.icon} class="w-6 h-6 text-accent"></i>
         <p class="font-heading font-extrabold text-2xl text-primary mt-2">{s.value}</p>
         <p class="text-xs font-heading font-semibold text-muted uppercase mt-0.5">{s.sub}</p>
@@ -82,15 +82,15 @@ const [umum, geografis, sejarah] = await Promise.all([
   <section id="umum" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Profil Umum</h2>
     <p class="text-muted mt-2 max-w-3xl leading-relaxed">
-      Desa Loji adalah desa pesisir yang terletak di Kecamatan Simpenan, Kabupaten Sukabumi, Provinsi Jawa Barat. Berbatasan langsung dengan Samudra Hindia di sebelah selatan, desa ini dikenal sebagai salah satu pintu masuk menuju kawasan Geopark Ciletuh — geopark pertama di Jawa yang diakui oleh UNESCO Global Geoparks.
+      Desa Sindangsari adalah desa dataran tinggi yang terletak di Kecamatan Kasomalang, Kabupaten Subang, Provinsi Jawa Barat. Berada pada ketinggian 500–600 mdpl dengan suhu udara sejuk (15–25°C), desa ini dikenal dengan lahan pertanian yang subur dan potensi ekowisata alam yang menjanjikan.
     </p>
     <div class="prose max-w-none mt-4 text-muted leading-relaxed" set:html={umum?.content_html ?? ''} />
     <div class="grid sm:grid-cols-2 gap-4 mt-6">
       {[
-        { label: 'Kecamatan', value: 'Simpenan' },
-        { label: 'Kabupaten', value: 'Sukabumi' },
+        { label: 'Kecamatan', value: 'Kasomalang' },
+        { label: 'Kabupaten', value: 'Subang' },
         { label: 'Provinsi', value: 'Jawa Barat' },
-        { label: 'Kode Pos', value: '43179' },
+        { label: 'Kode Pos', value: '41289' },
       ].map(row => (
         <div class="flex justify-between py-3 border-b border-line">
           <span class="font-heading font-semibold text-ink">{row.label}</span>
@@ -104,16 +104,16 @@ const [umum, geografis, sejarah] = await Promise.all([
   <section id="geografis" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Kondisi Geografis</h2>
     <p class="text-muted mt-2 max-w-3xl leading-relaxed">
-      Secara geografis, Desa Loji berada di koordinat sekitar -7.059° LS, 106.578° BT. Wilayahnya meliputi kawasan pantai, bukit, dan hutan pesisir. Topografi bervariasi dari dataran rendah di pinggir pantai hingga perbukitan yang menjorok ke dalam.
+      Secara geografis, Desa Sindangsari berada di koordinat sekitar -6.702° LS, 107.741° BT. Dari luas wilayah 305 ha, sekitar 161 ha berupa sawah, 60 ha pemukiman, dan 46 ha perkebunan. Desa berbatasan dengan Desa Bojongloa di utara, Desa Pasanggrahan di selatan, Desa Darmaga (Kec. Cisalak) di timur, dan Desa Kasomalang Wetan di barat.
     </p>
     <div class="prose max-w-none mt-4 text-muted leading-relaxed" set:html={geografis?.content_html ?? ''} />
     <div class="grid sm:grid-cols-3 gap-4 mt-6">
       {[
-        { icon: 'mountain', label: 'Ketinggian', value: '0–250 m dpl' },
-        { icon: 'thermometer', label: 'Iklim', value: 'Tropis Basah' },
-        { icon: 'waves', label: 'Garis Pantai', value: '±8 km' },
+        { icon: 'mountain', label: 'Ketinggian', value: '500–600 m dpl' },
+        { icon: 'thermometer', label: 'Suhu', value: '15–25°C' },
+        { icon: 'tree-pine', label: 'Luas Wilayah', value: '±305 ha' },
       ].map(item => (
-        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(16,35,26,.08)]">
           <i data-lucide={item.icon} class="w-6 h-6 text-accent"></i>
           <p class="text-xs font-heading font-semibold text-muted uppercase mt-2">{item.label}</p>
           <p class="font-heading font-bold text-xl text-primary mt-0.5">{item.value}</p>
@@ -126,19 +126,19 @@ const [umum, geografis, sejarah] = await Promise.all([
   <section id="sejarah" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Sejarah Desa</h2>
     <div class="prose max-w-none mt-4 text-muted leading-relaxed" set:html={sejarah?.content_html ?? `
-      <p>Desa Loji memiliki sejarah panjang sebagai perkampungan nelayan di tepi Samudra Hindia. Nama "Loji" diyakini berasal dari bangunan loji peninggalan masa kolonial yang pernah berdiri di kawasan ini. Masyarakat desa secara turun-temurun hidup dari hasil laut dan pertanian pesisir.</p>
-      <p>Posisi strategis Desa Loji sebagai gerbang Geopark Ciletuh mulai membuka babak baru bagi perekonomian desa, dengan pariwisata menjadi sektor yang terus berkembang di samping perikanan tradisional yang menjadi tulang punggung.</p>
+      <p>Nama "Sindangsari" berasal dari bahasa Sunda: <em>Sindang</em> yang berarti "singgah" dan <em>Sari</em> yang berarti "indah/menarik", sehingga bermakna tempat persinggahan yang nyaman dan asri. Desa Sindangsari resmi terbentuk pada tahun 1982 sebagai hasil pemekaran dari Desa Darmaga, Kecamatan Cisalak, yang diprakarsai tokoh masyarakat karena kepadatan penduduk dan jarak antarkampung yang jauh, dengan Bapak Endang Sopandi sebagai penjabat sementara kepala desa pertama.</p>
+      <p>Sebelum menjadi desa yang berdiri sendiri, kawasan ini memiliki sejarah panjang yang melibatkan berbagai masa kepemimpinan (Kuwu) sejak awal abad ke-20. Saat ini desa terus berkembang dengan fokus pada pertanian, ekowisata, dan ekonomi kreatif masyarakat.</p>
     `} />
   </section>
 
   <!-- Peta -->
   <section id="peta" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Peta Desa</h2>
-    <p class="text-muted mt-2">Lokasi Desa Loji di Kecamatan Simpenan, Kabupaten Sukabumi.</p>
-    <div id="profil-map" class="mt-4 rounded-2xl overflow-hidden border border-line shadow-[0_4px_10px_rgba(15,36,51,.08)]" style="height: 380px;"></div>
+    <p class="text-muted mt-2">Lokasi Desa Sindangsari di Kecamatan Kasomalang, Kabupaten Subang.</p>
+    <div id="profil-map" class="mt-4 rounded-2xl overflow-hidden border border-line shadow-[0_4px_10px_rgba(16,35,26,.08)]" style="height: 380px;"></div>
     <p class="text-sm text-muted mt-2 flex items-center gap-1.5">
       <i data-lucide="info" class="w-4 h-4"></i>
-      Koordinat: -7.059, 106.578 ·
+      Koordinat: -6.702, 107.741 ·
       <a href="/peta" class="text-accent hover:underline font-medium">Buka peta interaktif lengkap →</a>
     </p>
   </section>
@@ -148,7 +148,7 @@ const [umum, geografis, sejarah] = await Promise.all([
     <div class="bg-primary text-white rounded-2xl p-8 flex flex-col sm:flex-row items-center gap-6">
       <div class="flex-1">
         <h2 class="text-2xl font-heading font-extrabold">Pemerintahan Desa</h2>
-        <p class="text-white/80 mt-2">Pelajari struktur organisasi, perangkat desa, visi misi, dan tugas fungsi pemerintahan Desa Loji.</p>
+        <p class="text-white/80 mt-2">Pelajari struktur organisasi, perangkat desa, visi misi, dan tugas fungsi pemerintahan Desa Sindangsari.</p>
       </div>
       <a href="/pemerintahan" class="inline-flex items-center gap-2 bg-white text-primary font-heading font-semibold px-6 py-3 rounded-lg hover:bg-sand transition-colors min-h-[44px] shrink-0">
         <i data-lucide="landmark" class="w-5 h-5"></i> Lihat Pemerintahan
@@ -164,9 +164,9 @@ const [umum, geografis, sejarah] = await Promise.all([
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script is:inline>
   document.addEventListener('DOMContentLoaded', function() {
-    var map = L.map('profil-map', { scrollWheelZoom: false }).setView([-7.0589, 106.5778], 14);
+    var map = L.map('profil-map', { scrollWheelZoom: false }).setView([-6.7022, 107.7414], 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-    L.marker([-7.0589, 106.5778]).addTo(map).bindPopup('<b>Desa Loji</b><br>Kec. Simpenan, Sukabumi');
+    L.marker([-6.7022, 107.7414]).addTo(map).bindPopup('<b>Desa Sindangsari</b><br>Kec. Kasomalang, Subang');
     if (typeof lucide !== 'undefined') lucide.createIcons();
   });
   setTimeout(function() {
@@ -176,6 +176,6 @@ const [umum, geografis, sejarah] = await Promise.all([
 
 <style>
   .prose p { margin: .5rem 0; line-height: 1.75; }
-  .prose h3 { font-family: 'Lexend', sans-serif; font-weight: 700; color: #0E4A6E; margin: 1rem 0 .5rem; }
+  .prose h3 { font-family: 'Lexend', sans-serif; font-weight: 700; color: #166534; margin: 1rem 0 .5rem; }
   [id] { scroll-margin-top: 120px; }
 </style>

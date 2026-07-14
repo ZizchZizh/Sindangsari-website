@@ -12,17 +12,17 @@ if (!umkm) return Astro.redirect('/404');
 
 const mediaList = env ? await getMediaForEntity('umkm', umkm.id, env.DB) : [];
 const cover = mediaList[0];
-const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? 'https://desaloji.desa.id').href;
+const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? 'https://sindangsari.web.id').href;
 ---
 
 <Layout
-  title={`${umkm.nama} — UMKM Desa Loji`}
-  description={`${umkm.nama} · ${umkm.kategori} · ${umkm.lokasi ?? 'Desa Loji'}`}
+  title={`${umkm.nama} — UMKM Desa Sindangsari`}
+  description={`${umkm.nama} · ${umkm.kategori} · ${umkm.lokasi ?? 'Desa Sindangsari'}`}
   ogImage={cover ? `/api/media/${encodeURIComponent(cover.r2_key_display)}` : undefined}
 >
 
   <!-- Header -->
-  <div class="py-10 md:py-12" style="background:linear-gradient(135deg,#0E4A6E,#0A3650);">
+  <div class="py-10 md:py-12" style="background:linear-gradient(135deg,#166534,#14532D);">
     <div class="mx-auto max-w-6xl px-4 md:px-6 text-white">
       <nav aria-label="Breadcrumb" class="text-sm mb-3 opacity-75">
         <a href="/" class="hover:underline">Beranda</a> /
@@ -154,7 +154,7 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? 'https://desaloji.de
 
         <!-- Disclaimer -->
         <p class="text-xs text-text-muted mt-3 text-center italic">
-          Transaksi dilakukan langsung dengan UMKM. Pemerintah Desa Loji tidak memungut biaya apapun.
+          Transaksi dilakukan langsung dengan UMKM. Pemerintah Desa Sindangsari tidak memungut biaya apapun.
         </p>
       </aside>
 

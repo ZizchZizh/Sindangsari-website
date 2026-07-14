@@ -1,38 +1,39 @@
--- ── Page section seed (placeholder content, Bahasa Indonesia) ──
+-- ── Page section seed (konten Desa Sindangsari, Kec. Kasomalang, Kab. Subang) ──
 INSERT OR IGNORE INTO page_section (slug, title, content_html, cover_alt) VALUES
-  ('beranda-hero',        'Selamat Datang di Desa Loji',      '<p>Desa Loji adalah desa yang kaya akan potensi wisata bahari dan kearifan lokal di Kecamatan Simpenan, Kabupaten Sukabumi.</p>', 'Panorama Pantai Loji'),
-  ('beranda-sekilas',     'Sekilas Desa Loji',                '<p>Desa Loji berdiri sejak abad ke-18 dan telah menjadi pusat perikanan dan pariwisata di pesisir selatan Sukabumi. Dengan luas wilayah ±2.500 ha, desa ini dihuni oleh sekitar 4.500 jiwa yang hidup berdampingan secara harmonis.</p>', NULL),
-  ('profil-umum',         'Profil Umum',                      '<p>Desa Loji terletak di pesisir Samudra Hindia, tepatnya di Kecamatan Simpenan, Kabupaten Sukabumi, Jawa Barat. Desa ini dikenal sebagai destinasi wisata bahari unggulan.</p>', NULL),
-  ('profil-geografis',    'Kondisi Geografis',                '<p>Desa Loji berada pada ketinggian 0–50 mdpl dengan topografi datar hingga berbukit di bagian utara. Wilayahnya berbatasan langsung dengan Samudra Hindia di sebelah selatan, menjadikannya kaya akan sumber daya kelautan.</p>', NULL),
-  ('profil-sejarah',      'Sejarah Desa',                     '<p>Desa Loji didirikan pada masa penjajahan Belanda sebagai pelabuhan kecil. Nama "Loji" berasal dari kata "loge" (bahasa Belanda) yang berarti gudang atau tempat penyimpanan. Sejak kemerdekaan, desa ini berkembang menjadi kawasan wisata dan perikanan yang maju.</p>', NULL),
-  ('potensi',             'Potensi Desa Loji',                '<h2>Pariwisata</h2><p>Pantai-pantai di Desa Loji menawarkan panorama yang memukau dengan ombak Samudra Hindia yang eksotis.</p><h2>Perikanan</h2><p>Desa Loji memiliki potensi perikanan laut yang besar dengan hasil tangkapan ikan segar melimpah setiap harinya.</p><h2>Pertanian</h2><p>Lahan pertanian di bagian utara desa menghasilkan palawija dan sayuran berkualitas tinggi.</p>', NULL),
-  ('pemerintahan-visi-misi', 'Visi & Misi Pemerintahan Desa', '<h2>Visi</h2><p>"Terwujudnya Desa Loji yang Maju, Mandiri, dan Sejahtera Berbasis Potensi Lokal Berkelanjutan"</p><h2>Misi</h2><ol><li>Meningkatkan kualitas pelayanan publik yang transparan dan akuntabel.</li><li>Mengembangkan potensi wisata, perikanan, dan UMKM lokal secara berkelanjutan.</li><li>Memperkuat infrastruktur desa dan ketahanan lingkungan.</li><li>Meningkatkan sumber daya manusia yang berdaya saing.</li></ol>', NULL),
-  ('pemerintahan-ruang-lingkup', 'Ruang Lingkup Pemerintahan', '<p>Pemerintah Desa Loji mengelola wilayah seluas ±2.500 ha yang mencakup 5 dusun, 12 RW, dan 38 RT dengan jumlah penduduk sekitar 4.500 jiwa.</p>', NULL),
-  ('pemerintahan-tugas-fungsi', 'Tugas & Fungsi', '<p>Pemerintah Desa Loji bertugas menyelenggarakan pemerintahan desa, melaksanakan pembangunan, pembinaan kemasyarakatan, dan pemberdayaan masyarakat sesuai dengan Undang-Undang Desa No. 6 Tahun 2014.</p>', NULL);
+  ('beranda-hero',        'Selamat Datang di Desa Sindangsari',      '<p>Desa Sindangsari adalah desa yang asri dan sejuk di dataran tinggi Kecamatan Kasomalang, Kabupaten Subang, Jawa Barat. Dikelilingi perbukitan hijau dan lahan pertanian yang subur.</p>', 'Panorama Desa Sindangsari'),
+  ('beranda-sekilas',     'Sekilas Desa Sindangsari',                '<p>Desa Sindangsari merupakan hasil pemekaran dari Desa Darmaga pada tahun 1982. Terletak di ketinggian 500–600 mdpl, desa ini memiliki luas wilayah sekitar 305 hektar yang terdiri dari 3 dusun, 7 RW, dan 24 RT, dihuni sekitar 7.600 jiwa. Masyarakatnya hidup harmonis dengan mata pencaharian utama di bidang pertanian.</p>', NULL),
+  ('profil-umum',         'Profil Umum',                      '<p>Desa Sindangsari terletak di kawasan dataran tinggi Kecamatan Kasomalang, Kabupaten Subang, Jawa Barat. Dengan ketinggian 500–600 mdpl dan suhu udara sejuk (15–25°C), desa ini dikenal sebagai kawasan pertanian yang subur dan berpotensi wisata alam.</p>', NULL),
+  ('profil-geografis',    'Kondisi Geografis',                '<p>Desa Sindangsari berada pada ketinggian 500–600 meter di atas permukaan laut dengan topografi berbukit dan lembah. Dari luas wilayah 305 hektar, sekitar 161 ha berupa sawah, 60 ha pemukiman, dan 46 ha perkebunan. Desa berbatasan dengan Desa Bojongloa di utara, Desa Pasanggrahan di selatan, Desa Darmaga (Kec. Cisalak) di timur, dan Desa Kasomalang Wetan di barat. Suhu udara relatif sejuk berkisar antara 15–25°C sepanjang tahun.</p>', NULL),
+  ('profil-sejarah',      'Sejarah Desa',                     '<p>Nama "Sindangsari" berasal dari bahasa Sunda: <em>Sindang</em> yang berarti "singgah" dan <em>Sari</em> yang berarti "indah/menarik", sehingga bermakna tempat persinggahan yang nyaman dan asri. Desa Sindangsari resmi terbentuk pada tahun 1982 sebagai hasil pemekaran dari Desa Darmaga, Kecamatan Cisalak, karena pertimbangan kepadatan penduduk dan luas wilayah.</p>', NULL),
+  ('potensi',             'Potensi Desa Sindangsari',                '<h2>Pertanian</h2><p>Lahan pertanian yang subur menghasilkan komoditas unggulan seperti padi, jagung, singkong, serta beragam buah-buahan seperti alpukat, durian, jeruk bali, dan nangka.</p><h2>Pariwisata</h2><p>Potensi ekowisata yang besar dengan keindahan alam pegunungan, curug (air terjun), dan panorama perbukitan hijau.</p><h2>Ekonomi Kreatif</h2><p>Industri rumah tangga yang menghasilkan makanan ringan tradisional seperti kerupuk, opak, ranginang, serta kopi aren khas Kasomalang.</p>', NULL),
+  ('pemerintahan-visi-misi', 'Visi & Misi Pemerintahan Desa', '<h2>Visi</h2><p>"Terwujudnya Desa Sindangsari yang Maju, Mandiri, dan Sejahtera Berbasis Potensi Lokal dan Kearifan Budaya Sunda"</p><h2>Misi</h2><ol><li>Meningkatkan kualitas pelayanan publik yang transparan dan akuntabel.</li><li>Mengembangkan potensi pertanian, pariwisata, dan UMKM lokal secara berkelanjutan.</li><li>Memperkuat infrastruktur desa dan kelestarian lingkungan.</li><li>Meningkatkan kualitas sumber daya manusia melalui pendidikan dan pemberdayaan masyarakat.</li></ol>', NULL),
+  ('pemerintahan-ruang-lingkup', 'Ruang Lingkup Pemerintahan', '<p>Pemerintah Desa Sindangsari mengelola wilayah seluas ±305 hektar yang mencakup 3 dusun, 7 RW, dan 24 RT. Desa ini mencakup kampung-kampung: Limaratus, Sindangsari, Cimalingping, Cipunagara, Kalapa Beureum, Babakan Muncang, Sukamaju, dan Sukamaju Girang.</p>', NULL),
+  ('pemerintahan-tugas-fungsi', 'Tugas & Fungsi', '<p>Pemerintah Desa Sindangsari bertugas menyelenggarakan pemerintahan desa, melaksanakan pembangunan, pembinaan kemasyarakatan, dan pemberdayaan masyarakat sesuai dengan Undang-Undang Desa No. 6 Tahun 2014.</p>', NULL);
 
 -- ── Perangkat desa seed ──
-INSERT OR IGNORE INTO perangkat_desa (nama, jabatan, urutan) VALUES
-  ('(Segera Diisi)',     'Kepala Desa',          1),
-  ('(Segera Diisi)',     'Sekretaris Desa',       2),
-  ('(Segera Diisi)',     'Kaur Keuangan',         3),
-  ('(Segera Diisi)',     'Kaur Umum',             4),
-  ('(Segera Diisi)',     'Kasi Pemerintahan',     5),
-  ('(Segera Diisi)',     'Kasi Kesejahteraan',    6),
-  ('(Segera Diisi)',     'Kasi Pelayanan',        7);
+-- id eksplisit agar INSERT OR IGNORE idempoten saat db:setup dijalankan ulang
+INSERT OR IGNORE INTO perangkat_desa (id, nama, jabatan, urutan) VALUES
+  (1, 'Vovi Pathul Hidayat',     'Kepala Desa',          1),
+  (2, '(Segera Diisi)',     'Sekretaris Desa',       2),
+  (3, '(Segera Diisi)',     'Kaur Keuangan',         3),
+  (4, '(Segera Diisi)',     'Kaur Umum',             4),
+  (5, '(Segera Diisi)',     'Kasi Pemerintahan',     5),
+  (6, '(Segera Diisi)',     'Kasi Kesejahteraan',    6),
+  (7, '(Segera Diisi)',     'Kasi Pelayanan',        7);
 
 -- ── Wisata seed ──
 INSERT OR IGNORE INTO wisata (slug, nama, deskripsi_html, status) VALUES
-  ('pantai-loji', 'Pantai Loji', '<p>Pantai Loji adalah destinasi wisata utama Desa Loji dengan hamparan pasir putih dan ombak Samudra Hindia yang indah. Cocok untuk wisata keluarga, snorkeling, dan menikmati matahari terbenam.</p>', 'published'),
-  ('pantai-karang-sari', 'Pantai Karang Sari', '<p>Pantai Karang Sari menawarkan keindahan batu karang alami yang tersusun indah di sepanjang garis pantai. Ideal untuk fotografi alam dan menikmati ketenangan alam pesisir.</p>', 'published');
+  ('curug-masigit', 'Curug Masigit', '<p>Curug Masigit merupakan air terjun eksotis yang terletak di Desa Pasanggrahan, Kecamatan Kasomalang. Airnya sangat jernih berwarna hijau kebiruan, diapit oleh tebing batu yang megah. Tersedia area untuk berenang dan lokasi berkemah.</p>', 'published'),
+  ('ekowisata-alam-kasomalang', 'Ekowisata Alam Kasomalang', '<p>Kawasan ekowisata terpadu di Kecamatan Kasomalang yang menawarkan keindahan alam pegunungan, udara sejuk, dan pemandangan perbukitan hijau. Cocok untuk hiking, agrowisata, dan menikmati keasrian alam pedesaan Sunda.</p>', 'published');
 
 -- ── UMKM seed ──
 INSERT OR IGNORE INTO umkm (slug, nama, kategori, deskripsi_html, lokasi, wa_number, status) VALUES
-  ('kerajinan-bambu-loji', 'Kerajinan Bambu Loji', 'Kriya', '<p>Produk kerajinan tangan dari bambu pilihan yang diproses secara tradisional oleh warga Desa Loji. Tersedia berbagai produk mulai dari perabot rumah tangga hingga souvenir khas desa.</p>', 'Dusun Ciawi, Desa Loji', '6281234567890', 'published'),
-  ('warung-ikan-bakar-bu-sari', 'Warung Ikan Bakar Bu Sari', 'Kuliner', '<p>Menyajikan ikan bakar segar hasil tangkapan nelayan Desa Loji dengan bumbu khas Sunda. Buka setiap hari dari pukul 10.00 hingga 22.00 WIB.</p>', 'Tepi Pantai Loji', '6282345678901', 'published'),
-  ('kebun-sayur-pak-budi', 'Kebun Sayur Pak Budi', 'Hasil Tani', '<p>Menyediakan aneka sayuran segar organik dari kebun milik sendiri. Tersedia juga paket langganan mingguan untuk warga sekitar.</p>', 'Dusun Ciawi, Desa Loji', NULL, 'published');
+  ('kerupuk-opak-ranginang', 'Kerupuk, Opak & Ranginang', 'Makanan Tradisional', '<p>Produk olahan makanan ringan tradisional khas Sunda yang dibuat secara handmade oleh ibu-ibu Desa Sindangsari. Tersedia kerupuk, opak, dan ranginang dengan cita rasa autentik.</p>', 'Kampung Limaratus, Desa Sindangsari', '6281234567890', 'published'),
+  ('kopi-aren-kasomalang', 'Kopi Aren Kasomalang', 'Kuliner', '<p>Kopi pilihan dari dataran tinggi Kasomalang yang disajikan dengan gula aren asli. Cita rasa khas yang menggabungkan pahit kopi dan manisnya aren alami.</p>', 'Kampung Sindangsari, Desa Sindangsari', '6282345678901', 'published'),
+  ('keripik-bonggol-pisang', 'Keripik Bonggol Pisang', 'Makanan Olahan', '<p>Camilan unik dari bonggol pisang yang diolah menjadi keripik renyah dengan berbagai varian rasa. Inovasi produk lokal yang ramah lingkungan dan bernilai ekonomi tinggi.</p>', 'Kampung Sukamaju, Desa Sindangsari', NULL, 'published');
 
 -- ── Titik peta seed ──
-INSERT OR IGNORE INTO titik_peta (lat, lng, jenis, linked_slug, label) VALUES
-  (-7.0508, 106.5444, 'wisata', 'pantai-loji', 'Pantai Loji'),
-  (-7.0650, 106.5350, 'wisata', 'pantai-karang-sari', 'Pantai Karang Sari'),
-  (-7.0350, 106.5580, 'umkm', 'kerajinan-bambu-loji', 'Kerajinan Bambu Loji');
+INSERT OR IGNORE INTO titik_peta (id, lat, lng, jenis, linked_slug, label) VALUES
+  (1, -6.7150, 107.7350, 'wisata', 'curug-masigit', 'Curug Masigit'),
+  (2, -6.7100, 107.7300, 'wisata', 'ekowisata-alam-kasomalang', 'Ekowisata Alam Kasomalang'),
+  (3, -6.7010, 107.7420, 'umkm', 'kerupuk-opak-ranginang', 'Kerupuk, Opak & Ranginang');

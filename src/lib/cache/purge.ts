@@ -1,4 +1,6 @@
-const SITE_ORIGIN = 'https://desaloji.desa.id';
+// Must match the domain the Worker serves (see routes in wrangler.toml) —
+// cache.delete() only purges entries for this exact origin.
+const SITE_ORIGIN = 'https://sindangsari.web.id';
 
 export async function purgeCache(paths: string[]): Promise<void> {
   try {

@@ -3,7 +3,7 @@ import type { APIRoute } from 'astro';
 
 export const GET: APIRoute = async ({ locals }) => {
   const env = getEnv();
-  const base = 'https://desaloji.desa.id';
+  const base = 'https://sindangsari.web.id';
 
   const staticUrls = [
     { loc: base, priority: '1.0', changefreq: 'weekly' },

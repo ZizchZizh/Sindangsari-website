@@ -8,18 +8,18 @@ const env = getEnv();
 const wisataList = env ? await getPublishedWisata(env.DB) : [];
 
 const demoWisata = [
-  { slug: 'pantai-loji', nama: 'Pantai Loji', deskripsi_html: 'Pantai pesisir selatan yang memukau, gerbang utama menuju Geopark Ciletuh. Ombak bersih, pasir hitam vulkanik, dan pemandangan matahari terbenam yang spektakuler.', img: '/images/pantai_loji.png', tag: 'Pantai' },
-  { slug: 'kuil-dewi-kwan-im', nama: 'Kuil Dewi Kwan Im', deskripsi_html: 'Vihara Nam Hai Kwan Se Im Pu Sa dengan arsitektur khas Tionghoa yang berdiri indah di tepi pantai. Tempat ibadah dan wisata budaya yang tenang.', img: '/images/karang_sari.png', tag: 'Budaya' },
-  { slug: 'gerbang-geopark-ciletuh', nama: 'Gerbang Geopark Ciletuh', deskripsi_html: 'Pintu masuk utama ke Geopark Ciletuh yang diakui UNESCO. Pemandangan tebing, muara, dan hutan pesisir yang dramatis.', img: '/images/pantai_loji.png', tag: 'Alam' },
-  { slug: 'muara-sungai-loji', nama: 'Muara Sungai Loji', deskripsi_html: 'Pertemuan sungai dan laut yang menciptakan ekosistem mangrove unik. Lokasi favorit memancing dan pengamatan burung.', img: '/images/pantai_loji.png', tag: 'Alam' },
-  { slug: 'spot-sunset-karang', nama: 'Spot Sunset Karang', deskripsi_html: 'Tebing karang yang menjorok ke laut — tempat terbaik menyaksikan matahari terbenam di cakrawala Samudra Hindia.', img: '/images/karang_sari.png', tag: 'Pemandangan' },
-  { slug: 'pasar-ikan-nelayan', nama: 'Pasar Ikan Nelayan', deskripsi_html: 'Pasar ikan tradisional tempat nelayan menjual hasil tangkapan segar langsung dari perahu. Aktif dari dini hari hingga pagi.', img: '/images/nelayan.png', tag: 'Budaya' },
+  { slug: 'curug-masigit', nama: 'Curug Masigit', deskripsi_html: 'Air terjun eksotis di kawasan Kasomalang dengan air jernih berwarna hijau kebiruan, diapit tebing batu yang megah. Tersedia area berenang dan lokasi berkemah.', img: '/images/curug_masigit.png', tag: 'Air Terjun' },
+  { slug: 'ekowisata-alam-kasomalang', nama: 'Ekowisata Alam Kasomalang', deskripsi_html: 'Kawasan ekowisata pegunungan dengan udara sejuk 15–25°C dan panorama perbukitan hijau. Cocok untuk hiking, agrowisata, dan menikmati keasrian alam Sunda.', img: '/images/ekowisata_kasomalang.png', tag: 'Alam' },
+  { slug: 'panorama-sawah-sindangsari', nama: 'Panorama Sawah Sindangsari', deskripsi_html: 'Hamparan sawah 161 hektar berlatar perbukitan di ketinggian 500–600 mdpl. Spot terbaik menikmati matahari terbit dan udara pagi pegunungan.', img: '/images/sawah_sindangsari.png', tag: 'Panorama' },
+  { slug: 'agrowisata-kebun-buah', nama: 'Agrowisata Kebun Buah', deskripsi_html: 'Kebun buah warga dengan alpukat, durian, jeruk bali, nangka, dan nanas khas Subang. Pengunjung dapat memetik buah langsung saat musim panen.', img: '/images/kebun_sayur.png', tag: 'Agrowisata' },
+  { slug: 'jalur-hiking-perbukitan', nama: 'Jalur Hiking Perbukitan', deskripsi_html: 'Rute jelajah alam melintasi perbukitan, lembah, dan aliran mata air pegunungan yang jernih. Pemandu lokal siap menemani perjalanan Anda.', img: '/images/hero_sindangsari.png', tag: 'Alam' },
+  { slug: 'wisata-budaya-kampung-limaratus', nama: 'Kampung Limaratus', deskripsi_html: 'Kampung terbesar sekaligus pusat aktivitas masyarakat desa. Dikenal dengan tradisi pembuatan kue dan makanan ringan khas Sunda secara turun-temurun.', img: '/images/gotong_royong.png', tag: 'Budaya' },
 ];
 
 const getWisataImg = (slug: string) => {
-  if (slug === 'pantai-loji') return '/images/pantai_loji.png';
-  if (slug === 'pantai-karang-sari') return '/images/karang_sari.png';
-  return '/images/pantai_loji.png';
+  if (slug === 'curug-masigit') return '/images/curug_masigit.png';
+  if (slug === 'ekowisata-alam-kasomalang') return '/images/ekowisata_kasomalang.png';
+  return '/images/hero_sindangsari.png';
 };
 
 const displayList = wisataList.length > 0
@@ -28,20 +28,20 @@ const displayList = wisataList.length > 0
 ---
 
 <Layout
-  title="Wisata — Desa Loji"
-  description="Jelajahi 6 destinasi wisata unggulan Desa Loji: pantai, geopark, kuil, dan budaya pesisir Sukabumi."
+  title="Wisata — Desa Sindangsari"
+  description="Jelajahi destinasi wisata unggulan Desa Sindangsari: curug, ekowisata alam, agrowisata, dan budaya Sunda dataran tinggi Subang."
 >
 
 <!-- Hero -->
 <section class="relative">
   <div class="h-48 sm:h-64 overflow-hidden">
     <img
-      src="/images/pantai_loji.png"
-      alt="Pantai Loji dan kawasan Geopark Ciletuh"
+      src="/images/hero_sindangsari.png"
+      alt="Curug Masigit dan kawasan Ekowisata Kasomalang"
       class="w-full h-full object-cover"
     />
   </div>
-  <div class="absolute inset-0" style="background: rgba(10,54,80,0.55);"></div>
+  <div class="absolute inset-0" style="background: rgba(20,83,45,0.55);"></div>
   <div class="absolute inset-0 flex items-end">
     <div class="mx-auto max-w-[1152px] px-4 sm:px-6 w-full pb-6 text-white">
       <nav aria-label="Breadcrumb" class="text-sm text-white/80 flex items-center gap-1.5">
@@ -49,8 +49,8 @@ const displayList = wisataList.length > 0
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
         <span class="font-medium">Wisata</span>
       </nav>
-      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Destinasi Wisata Desa Loji</h1>
-      <p class="text-white/85 mt-1">Temukan keindahan alam dan budaya pesisir selatan Sukabumi</p>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Destinasi Wisata Desa Sindangsari</h1>
+      <p class="text-white/85 mt-1">Temukan keindahan alam dan budaya dataran tinggi Subang</p>
     </div>
   </div>
 </section>
@@ -58,7 +58,7 @@ const displayList = wisataList.length > 0
 <main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-10">
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {displayList.map(w => (
-      <article class="group bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_12px_24px_rgba(15,36,51,.12)] hover:border-accent transition-all flex flex-col">
+      <article class="group bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(16,35,26,.08)] hover:shadow-[0_12px_24px_rgba(16,35,26,.12)] hover:border-accent transition-all flex flex-col">
         <a href={`/wisata/${w.slug}`} class="block aspect-[16/10] overflow-hidden relative">
           {w.img ? (
             <img
@@ -68,7 +68,7 @@ const displayList = wisataList.length > 0
               loading="lazy"
             />
           ) : (
-            <div class="w-full h-full" style="background: linear-gradient(135deg, #0E4A6E, #0E9AA7);"></div>
+            <div class="w-full h-full" style="background: linear-gradient(135deg, #166534, #059669);"></div>
           )}
           <span class="absolute top-3 left-3 bg-white/90 backdrop-blur text-primary text-xs font-heading font-semibold px-2.5 py-1 rounded-full">{w.tag}</span>
         </a>

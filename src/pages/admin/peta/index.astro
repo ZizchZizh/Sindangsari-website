@@ -39,7 +39,7 @@ const titikJson = JSON.stringify(titikList);
           <label for="label" class="block font-heading font-medium text-sm mb-1.5">Label</label>
           <input type="text" id="label" name="label"
             class="w-full rounded-lg border px-4 py-2.5 text-base focus:outline-none"
-            style="border-color:var(--color-border); min-height:44px;" placeholder="cth. Pantai Loji" />
+            style="border-color:var(--color-border); min-height:44px;" placeholder="cth. Curug Masigit" />
         </div>
         <div>
           <label for="jenis" class="block font-heading font-medium text-sm mb-1.5">Jenis <span>*</span></label>
@@ -55,20 +55,20 @@ const titikJson = JSON.stringify(titikList);
           <label for="linked_slug" class="block font-heading font-medium text-sm mb-1.5">Slug Entitas <span>*</span></label>
           <input type="text" id="linked_slug" name="linked_slug" required
             class="w-full rounded-lg border px-4 py-2.5 text-base focus:outline-none"
-            style="border-color:var(--color-border); min-height:44px;" placeholder="cth. pantai-loji" />
+            style="border-color:var(--color-border); min-height:44px;" placeholder="cth. curug-masigit" />
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label for="lat" class="block font-heading font-medium text-sm mb-1.5">Lintang <span>*</span></label>
             <input type="number" id="lat" name="lat" step="any" required
               class="w-full rounded-lg border px-4 py-2.5 text-base focus:outline-none"
-              style="border-color:var(--color-border); min-height:44px;" placeholder="-7.0850" />
+              style="border-color:var(--color-border); min-height:44px;" placeholder="-6.7022" />
           </div>
           <div>
             <label for="lng" class="block font-heading font-medium text-sm mb-1.5">Bujur <span>*</span></label>
             <input type="number" id="lng" name="lng" step="any" required
               class="w-full rounded-lg border px-4 py-2.5 text-base focus:outline-none"
-              style="border-color:var(--color-border); min-height:44px;" placeholder="106.5050" />
+              style="border-color:var(--color-border); min-height:44px;" placeholder="107.7414" />
           </div>
         </div>
         <button type="submit"
@@ -100,8 +100,8 @@ const titikJson = JSON.stringify(titikList);
             <td class="px-4 py-3 font-medium">{t.label ?? '—'}</td>
             <td class="px-4 py-3">
               <span class:list={['inline-flex px-2 py-0.5 rounded-full text-xs font-medium',
-                t.jenis === 'wisata'  ? 'bg-cyan-100 text-cyan-700' :
-                t.jenis === 'umkm'   ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700']}>
+                t.jenis === 'wisata'  ? 'bg-teal-100 text-teal-700' :
+                t.jenis === 'umkm'   ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700']}>
                 {t.jenis}
               </span>
             </td>
@@ -131,12 +131,12 @@ const titikJson = JSON.stringify(titikList);
 
 <script define:vars={{ titikJson }}>
   const titiks = JSON.parse(titikJson);
-  const map = L.map('admin-map').setView([-7.085, 106.505], 14);
+  const map = L.map('admin-map').setView([-6.7022, 107.7414], 14);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
   }).addTo(map);
 
-  const colors = { wisata: '#0E9AA7', umkm: '#15803D', potensi: '#0E4A6E' };
+  const colors = { wisata: '#0D9488', umkm: '#15803D', potensi: '#B45309' };
   titiks.forEach(t => {
     const icon = L.circleMarker([t.lat, t.lng], {
       radius: 8, fillColor: colors[t.jenis] ?? '#666', color: '#fff',

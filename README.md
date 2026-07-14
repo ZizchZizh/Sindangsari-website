@@ -1,6 +1,10 @@
-# Website Desa Loji
+# Website Desa Sindangsari
 
-Website resmi Desa Loji — dibangun sebagai bagian dari program **KKN-T Inovasi IPB University 2026** di Desa Loji, Kabupaten Sukabumi. Situs ini menampilkan profil desa, potensi (pertanian, perikanan, pariwisata), direktori UMKM, peta interaktif, dan berita desa, lengkap dengan panel admin agar perangkat desa dapat mengelola konten sendiri tanpa bantuan teknis.
+Website resmi Desa Sindangsari — dibangun sebagai bagian dari program **KKN-T Inovasi IPB University 2026** di Desa Sindangsari, Kecamatan Kasomalang, Kabupaten Subang, Jawa Barat. Situs ini menampilkan profil desa, potensi (pertanian, pariwisata, ekonomi kreatif), direktori UMKM, peta interaktif, dan berita desa, lengkap dengan panel admin agar perangkat desa dapat mengelola konten sendiri tanpa bantuan teknis.
+
+## Tentang Desa Sindangsari
+
+Desa Sindangsari terletak di dataran tinggi Subang selatan (500–600 mdpl) dengan luas ±305 ha (3 dusun, 7 RW, 24 RT) dan penduduk sekitar 7.600 jiwa. Desa ini merupakan hasil pemekaran Desa Darmaga (Kec. Cisalak) pada tahun 1982. Mata pencaharian utama warganya adalah pertanian (padi, palawija, buah-buahan), ditopang ekonomi kreatif rumah tangga (opak, ranginang, kerupuk, kopi aren) dan potensi ekowisata alam Kasomalang seperti Curug Masigit.
 
 ## Tumpukan Teknologi (Tech Stack)
 
@@ -12,8 +16,7 @@ Website resmi Desa Loji — dibangun sebagai bagian dari program **KKN-T Inovasi
 | Penyimpanan media | [Cloudflare R2](https://developers.cloudflare.com/r2/) (objek/gambar) |
 | Sesi login | [Cloudflare KV](https://developers.cloudflare.com/kv/) |
 | Styling | [Tailwind CSS 4](https://tailwindcss.com) |
-| Peta | [Leaflet](https://leafletjs.com) |
-| Komponen interaktif | React 19 |
+| Peta | [Leaflet](https://leafletjs.com) + OpenStreetMap |
 
 Pilihan ini menjaga biaya operasional tetap rendah (target ~Rp300 ribu/tahun) dengan memanfaatkan tier gratis Cloudflare.
 
@@ -32,8 +35,7 @@ src/
 │   ├── (publik)     index, profil, potensi, wisata, umkm, peta, berita, kontak
 │   ├── admin/       Panel admin (dasbor + kelola konten)
 │   └── api/         Endpoint form admin, media, dan cron
-└── middleware.ts    Penjaga rute /admin
-
+└── middleware.ts    Penjaga rute /admin dan /api/admin
 migrations/          Skema D1 (0001) + data awal (0002)
 public/images/       Aset gambar statis
 ```
@@ -64,7 +66,7 @@ Situs akan tersedia di `http://localhost:4321`.
 ## Konfigurasi & Rahasia
 
 - Salin `.dev.vars.example` menjadi `.dev.vars` untuk variabel lingkungan lokal. File `.dev.vars` **tidak boleh** di-commit (sudah ada di `.gitignore`).
-- `wrangler.toml` memuat ID placeholder — ganti `database_id` (D1) dan `id` (KV) dengan nilai asli setelah membuat resource di akun Cloudflare.
+- `wrangler.toml` memuat ID resource — pastikan `database_id` (D1) dan `id` (KV) sesuai resource di akun Cloudflare milik desa.
 - Rahasia produksi diatur lewat `wrangler secret put NAMA_SECRET`.
 
 ## Deploy ke Produksi
@@ -76,27 +78,24 @@ npm run deploy   # astro build && wrangler deploy
 Sebelum deploy pertama, buat resource Cloudflare berikut dan tempel ID-nya ke `wrangler.toml`:
 
 ```bash
-wrangler d1 create web-desa-loji-db
-wrangler r2 bucket create web-desa-loji-media
+wrangler d1 create web-desa-sindangsari-db
+wrangler r2 bucket create web-desa-sindangsari-media
 wrangler kv namespace create SESSION_KV
 ```
 
-Cron `0 0 * * 0` (tiap Minggu 00:00 UTC) menjalankan backup database otomatis ke R2.
+Situs diarahkan ke domain `sindangsari.web.id` (lihat `routes` di `wrangler.toml`). Backup mingguan otomatis (cron) saat ini **dinonaktifkan** — backup dilakukan manual lewat tombol ekspor di panel admin. Untuk mengaktifkan kembali, isi `crons = ["0 0 * * 0"]` di `wrangler.toml`.
 
 ## Panel Admin
 
 - Halaman setup pertama (`/admin/setup`) membuat akun admin awal — hanya bisa dipakai sekali (saat belum ada admin).
 - Login di `/admin/login`, lalu kelola konten dari `/admin/dasbor`.
 - Kata sandi disimpan sebagai hash PBKDF2 (SHA-256, 100.000 iterasi) dengan salt acak.
-
-## ⚠️ Status Keamanan
-
-Proyek ini **belum siap dideploy ke publik**. Audit internal menemukan bahwa endpoint `/api/admin/*` belum memverifikasi sesi login, sehingga operasi tulis/hapus dan ekspor data dapat diakses tanpa autentikasi. Perbaikan otorisasi wajib dilakukan sebelum situs dipublikasikan. Lihat catatan tim untuk detail.
+- Middleware (`src/middleware.ts`) melindungi seluruh rute `/admin/*` dan `/api/admin/*` dengan sesi KV; percobaan login dibatasi 5 kali per IP per 15 menit.
 
 ## Status Pengembangan
 
-Dibangun mengikuti alur perencanaan terstruktur (brief → PRD → UX → arsitektur → epics & stories). Seluruh 30 story implementasi (Epic 1–7) telah dikerjakan dan menunggu tahap *code review*.
+Dibangun mengikuti alur perencanaan terstruktur (brief → PRD → UX → arsitektur → epics & stories). Seluruh 30 story implementasi (Epic 1–7) telah dikerjakan; pengamanan API admin (guard sesi, rate limiting login, proteksi kebocoran media) sudah diterapkan.
 
 ---
 
-*Dikembangkan oleh tim KKN-T Inovasi IPB University 2026 — Desa Loji, Kabupaten Sukabumi.*
+*Dikembangkan oleh tim KKN-T Inovasi IPB University 2026 — Desa Sindangsari, Kecamatan Kasomalang, Kabupaten Subang.*

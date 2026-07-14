@@ -15,13 +15,13 @@ const coverImage = mediaList[0];
 ---
 
 <Layout
-  title={`${wisata.nama} — Wisata Desa Loji`}
+  title={`${wisata.nama} — Wisata Desa Sindangsari`}
   description={wisata.deskripsi_html.replace(/<[^>]+>/g, '').slice(0, 160)}
   ogImage={coverImage ? `/api/media/${encodeURIComponent(coverImage.r2_key_display)}` : undefined}
 >
 
   <!-- Header -->
-  <div class="py-10 md:py-14" style="background:linear-gradient(135deg,#0E4A6E,#0A3650);">
+  <div class="py-10 md:py-14" style="background:linear-gradient(135deg,#166534,#14532D);">
     <div class="mx-auto max-w-6xl px-4 md:px-6 text-white">
       <nav aria-label="Breadcrumb" class="text-sm mb-3 opacity-75">
         <a href="/" class="hover:underline">Beranda</a> /
@@ -45,7 +45,7 @@ const coverImage = mediaList[0];
         />
       </div>
     ) : (
-      <div class="aspect-[16/7] rounded-xl overflow-hidden mb-8 flex items-center justify-center" style="background:linear-gradient(135deg,#E0F5F7,#F4EBDD);">
+      <div class="aspect-[16/7] rounded-xl overflow-hidden mb-8 flex items-center justify-center" style="background:linear-gradient(135deg,#D1FAE5,#F4EBDD);">
         <span class="font-heading font-bold text-6xl" style="color:var(--color-accent); opacity:.2;">{wisata.nama[0]}</span>
       </div>
     )}
@@ -75,7 +75,7 @@ const coverImage = mediaList[0];
       </div>
       <div>
         <p class="font-heading font-medium text-sm">Lihat di Peta</p>
-        <p class="text-text-muted text-xs">Temukan lokasi pada peta interaktif Desa Loji</p>
+        <p class="text-text-muted text-xs">Temukan lokasi pada peta interaktif Desa Sindangsari</p>
       </div>
       <a href="/peta" class="ml-auto px-3 py-1.5 rounded-md font-heading font-medium text-sm border transition-colors hover:bg-accent hover:text-white focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent" style="border-color:var(--color-accent); color:var(--color-accent);">
         Lihat di Peta →

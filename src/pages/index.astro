@@ -14,35 +14,35 @@ const [wisataList, umkmList, beritaList] = await Promise.all([
 ]);
 
 const demoWisata = [
-  { slug: 'pantai-loji', nama: 'Pantai Loji', img: '/images/pantai_loji.png', tag: 'Pantai', desc: 'Pantai pesisir selatan yang memukau, gerbang utama menuju Geopark Ciletuh.' },
-  { slug: 'kuil-dewi-kwan-im', nama: 'Kuil Dewi Kwan Im', img: '/images/karang_sari.png', tag: 'Budaya', desc: 'Vihara Nam Hai Kwan Se Im Pu Sa dengan arsitektur khas Tionghoa di tepi pantai.' },
-  { slug: 'geopark-ciletuh', nama: 'Geopark Ciletuh', img: '/images/pantai_loji.png', tag: 'Alam', desc: 'Kawasan geopark kelas dunia dengan pemandangan tebing, laut, dan flora unik.' },
+  { slug: 'curug-masigit', nama: 'Curug Masigit', img: '/images/curug_masigit.png', tag: 'Air Terjun', desc: 'Air terjun eksotis dengan air jernih berwarna hijau kebiruan, diapit tebing batu yang megah.' },
+  { slug: 'ekowisata-alam-kasomalang', nama: 'Ekowisata Alam Kasomalang', img: '/images/ekowisata_kasomalang.png', tag: 'Alam', desc: 'Keindahan alam pegunungan dengan udara sejuk dan panorama perbukitan hijau.' },
+  { slug: 'panorama-sindangsari', nama: 'Panorama Sindangsari', img: '/images/hero_sindangsari.png', tag: 'Panorama', desc: 'Pemandangan dataran tinggi yang memukau dengan sawah terasering dan perbukitan.' },
 ];
 
 const demoUmkm: Array<{slug:string;nama:string;kategori:string;img:string;wa:string|null;desc:string}> = [
-  { slug: 'sambal-ikan-loji', nama: 'Sambal Ikan Loji', kategori: 'Kuliner', img: '/images/ikan_bakar.png', wa: '6281234567890', desc: 'Olahan sambal ikan khas pesisir Desa Loji, pedas dan segar.' },
-  { slug: 'anyaman-bambu-diding', nama: 'Anyaman Bambu Pak Diding', kategori: 'Kriya', img: '/images/kerajinan_bambu.png', wa: '6281234567891', desc: 'Kerajinan anyaman bambu tangan bermotif khas tradisi Sunda.' },
-  { slug: 'kopi-kebun-loji', nama: 'Kopi Kebun Loji', kategori: 'Hasil Tani', img: '/images/kebun_sayur.png', wa: null, desc: 'Biji kopi pilihan hasil kebun setempat dengan cita rasa khas.' },
-  { slug: 'ikan-asin-nelayan', nama: 'Ikan Asin Nelayan Loji', kategori: 'Hasil Laut', img: '/images/ikan_bakar.png', wa: '6281234567892', desc: 'Ikan asin segar hasil tangkapan nelayan Pantai Loji.' },
+  { slug: 'kerupuk-opak-ranginang', nama: 'Kerupuk, Opak & Ranginang', kategori: 'Makanan Tradisional', img: '/images/kerupuk_tradisional.png', wa: '6281234567890', desc: 'Makanan ringan tradisional khas Sunda buatan ibu-ibu Desa Sindangsari.' },
+  { slug: 'kopi-aren-kasomalang', nama: 'Kopi Aren Kasomalang', kategori: 'Kuliner', img: '/images/kopi_aren.png', wa: '6282345678901', desc: 'Kopi pilihan dataran tinggi disajikan dengan gula aren asli.' },
+  { slug: 'keripik-bonggol-pisang', nama: 'Keripik Bonggol Pisang', kategori: 'Makanan Olahan', img: '/images/keripik_bonggol.png', wa: null, desc: 'Camilan unik dari bonggol pisang, inovasi produk lokal bernilai ekonomi tinggi.' },
+  { slug: 'hasil-tani-sindangsari', nama: 'Hasil Tani Sindangsari', kategori: 'Hasil Tani', img: '/images/sawah_sindangsari.png', wa: null, desc: 'Padi, jagung, dan buah-buahan segar dari dataran tinggi Sindangsari.' },
 ];
 
 const demoBerita = [
-  { slug: 'gotong-royong-bersih-pantai', judul: 'Gotong Royong Bersih Pantai Loji Menyambut Musim Kunjungan', published_at: '2026-07-12', img: '/images/gotong_royong.png', ringkasan: 'Warga bersama Karang Taruna membersihkan pesisir Pantai Loji dalam rangka menyambut meningkatnya kunjungan wisatawan.' },
-  { slug: 'pelatihan-digital-umkm', judul: 'Pelatihan Digital untuk UMKM Desa', published_at: '2026-07-08', img: '/images/pelatihan_umkm.png', ringkasan: 'Sepuluh pelaku UMKM mengikuti pelatihan foto produk dan WhatsApp Business.' },
-  { slug: 'peluncuran-situs-resmi', judul: 'Peluncuran Situs Resmi Desa Loji', published_at: '2026-07-01', img: '/images/pelatihan_umkm.png', ringkasan: 'Desa Loji kini punya kehadiran digital resmi yang dapat diakses siapa saja.' },
+  { slug: 'gotong-royong-desa', judul: 'Gotong Royong Warga Sindangsari Bersihkan Jalan Desa', published_at: '2026-07-12', img: '/images/gotong_royong.png', ringkasan: 'Warga bersama Karang Taruna bergotong royong membersihkan jalan desa menjelang musim hujan.' },
+  { slug: 'pelatihan-digital-umkm', judul: 'Pelatihan Digital Marketing untuk UMKM Desa', published_at: '2026-07-08', img: '/images/pelatihan_umkm.png', ringkasan: 'Sepuluh pelaku UMKM mengikuti pelatihan foto produk dan WhatsApp Business.' },
+  { slug: 'peluncuran-situs-resmi', judul: 'Peluncuran Situs Resmi Desa Sindangsari', published_at: '2026-07-01', img: '/images/pelatihan_umkm.png', ringkasan: 'Desa Sindangsari kini punya kehadiran digital resmi yang dapat diakses siapa saja.' },
 ];
 
 const getWisataImg = (slug: string) => {
-  if (slug === 'pantai-loji') return '/images/pantai_loji.png';
-  if (slug === 'pantai-karang-sari') return '/images/karang_sari.png';
-  return '/images/pantai_loji.png';
+  if (slug === 'curug-masigit') return '/images/curug_masigit.png';
+  if (slug === 'ekowisata-alam-kasomalang') return '/images/ekowisata_kasomalang.png';
+  return '/images/hero_sindangsari.png';
 };
 
 const getUmkmImg = (slug: string) => {
-  if (slug === 'kerajinan-bambu-loji') return '/images/kerajinan_bambu.png';
-  if (slug === 'warung-ikan-bakar-bu-sari') return '/images/ikan_bakar.png';
-  if (slug === 'kebun-sayur-pak-budi') return '/images/kebun_sayur.png';
-  return '/images/kerajinan_bambu.png';
+  if (slug === 'kerupuk-opak-ranginang') return '/images/kerupuk_tradisional.png';
+  if (slug === 'kopi-aren-kasomalang') return '/images/kopi_aren.png';
+  if (slug === 'keripik-bonggol-pisang') return '/images/keripik_bonggol.png';
+  return '/images/kerupuk_tradisional.png';
 };
 
 const finalWisata = wisataList.length > 0
@@ -59,8 +59,8 @@ const finalBerita = beritaList.length > 0
 ---
 
 <Layout
-  title="Desa Loji — Gerbang Geopark Ciletuh, Sukabumi"
-  description="Situs resmi Pemerintah Desa Loji, Kecamatan Simpenan, Kabupaten Sukabumi. Jelajahi wisata bahari, UMKM lokal, dan potensi desa pesisir yang memukau."
+  title="Desa Sindangsari — Desa Asri di Dataran Tinggi Subang"
+  description="Situs resmi Pemerintah Desa Sindangsari, Kecamatan Kasomalang, Kabupaten Subang. Jelajahi ekowisata, UMKM lokal, dan potensi desa dataran tinggi yang asri."
   transparentNav={true}
 >
 
@@ -73,27 +73,27 @@ const finalBerita = beritaList.length > 0
   <!-- Background photo -->
   <div
     class="absolute inset-0 bg-cover bg-center"
-    style="background-image: url('/images/pantai_loji.png');"
+    style="background-image: url('/images/hero_sindangsari.png');"
     role="img"
-    aria-label="Pantai Loji, pesisir selatan Sukabumi"
+    aria-label="Panorama Desa Sindangsari, Kasomalang, Subang"
   ></div>
   <!-- Gradient overlay -->
-  <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(10,54,80,0.55) 0%, rgba(10,54,80,0.35) 45%, rgba(10,54,80,0.75) 100%);"></div>
+  <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(20,83,45,0.55) 0%, rgba(20,83,45,0.35) 45%, rgba(20,83,45,0.75) 100%);"></div>
 
   <!-- Content -->
   <div class="relative mx-auto max-w-[1152px] px-4 sm:px-6 flex flex-col justify-end" style="min-height: 78vh; padding-bottom: 6rem;">
     <span class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white text-xs font-heading font-semibold px-3 py-1 rounded-full w-max mb-4">
       <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
-      Gerbang Geopark Ciletuh
+      Dataran Tinggi Kasomalang, Subang
     </span>
     <h1 id="hero-heading" class="font-heading font-extrabold text-white text-4xl sm:text-5xl lg:text-6xl leading-tight max-w-2xl">
-      Jelajahi<br/>Desa Loji
+      Jelajahi<br/>Desa Sindangsari
     </h1>
     <p class="text-white/85 text-lg mt-3 max-w-xl">
-      Pesisir selatan Sukabumi yang memukau — wisata bahari, kearifan lokal, dan UMKM pesisir yang hidup.
+      Desa asri di dataran tinggi Subang — ekowisata alam, kearifan Sunda, dan UMKM lokal yang hidup.
     </p>
     <div class="flex flex-wrap gap-3 mt-6">
-      <a href="/wisata" class="inline-flex items-center gap-2 bg-accent hover:bg-[#0a7d88] text-white font-heading font-semibold px-5 py-3 rounded-lg transition-colors min-h-[44px]">
+      <a href="/wisata" class="inline-flex items-center gap-2 bg-accent hover:bg-[#047857] text-white font-heading font-semibold px-5 py-3 rounded-lg transition-colors min-h-[44px]">
         <i data-lucide="compass" class="w-5 h-5"></i> Mulai Jelajahi
       </a>
       <a href="/peta" class="inline-flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur text-white font-heading font-semibold px-5 py-3 rounded-lg transition-colors border border-white/30 min-h-[44px]">
@@ -115,7 +115,7 @@ const finalBerita = beritaList.length > 0
       ].map(tile => (
         <a
           href={tile.href}
-          class="tile group relative block rounded-2xl overflow-hidden h-44 sm:h-56 shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_16px_32px_rgba(15,36,51,.16)] transition-shadow"
+          class="tile group relative block rounded-2xl overflow-hidden h-44 sm:h-56 shadow-[0_4px_10px_rgba(16,35,26,.08)] hover:shadow-[0_16px_32px_rgba(16,35,26,.16)] transition-shadow"
         >
           <img
             src={tile.img}
@@ -123,7 +123,7 @@ const finalBerita = beritaList.length > 0
             class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             loading="lazy"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-[#0A3650]/90 to-[#0A3650]/10 opacity-70 group-hover:opacity-85 transition-opacity duration-200"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-[#14532D]/90 to-[#14532D]/10 opacity-70 group-hover:opacity-85 transition-opacity duration-200"></div>
           <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5 flex items-center justify-between text-white">
             <span class="font-heading font-bold text-lg sm:text-xl">{tile.label}</span>
             <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200"></i>
@@ -138,10 +138,10 @@ const finalBerita = beritaList.length > 0
 <section class="mx-auto max-w-[1152px] px-4 sm:px-6 pt-16 pb-6 text-center" aria-labelledby="welcome-heading">
   <span class="text-accent font-heading font-semibold">Selamat Datang</span>
   <h2 id="welcome-heading" class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-2 max-w-2xl mx-auto leading-tight">
-    Desa pesisir yang ramah, kaya alam, dan terbuka untuk dunia
+    Desa dataran tinggi yang asri, subur, dan kaya budaya Sunda
   </h2>
   <p class="text-muted text-lg mt-4 max-w-2xl mx-auto">
-    Terletak di Kecamatan Simpenan, Kabupaten Sukabumi, Desa Loji adalah salah satu gerbang menuju Geopark Ciletuh — dengan pantai, budaya, dan UMKM yang siap menyambut Anda.
+    Terletak di Kecamatan Kasomalang, Kabupaten Subang, Desa Sindangsari menawarkan keindahan alam pegunungan, pertanian yang subur, dan kearifan lokal yang mempesona.
   </p>
 </section>
 
@@ -156,53 +156,53 @@ const finalBerita = beritaList.length > 0
     </div>
     <div class="grid lg:grid-cols-2 gap-6">
       <!-- Big card (left) -->
-      <a href={`/wisata/${finalWisata[0]?.slug ?? 'pantai-loji'}`}
-         class="group relative block rounded-2xl overflow-hidden h-80 lg:h-full min-h-[20rem] shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_16px_32px_rgba(15,36,51,.16)] transition-shadow">
+      <a href={`/wisata/${finalWisata[0]?.slug ?? 'curug-masigit'}`}
+         class="group relative block rounded-2xl overflow-hidden h-80 lg:h-full min-h-[20rem] shadow-[0_4px_10px_rgba(16,35,26,.08)] hover:shadow-[0_16px_32px_rgba(16,35,26,.16)] transition-shadow">
         <img
-          src={finalWisata[0]?.img || '/images/pantai_loji.png'}
-          alt={finalWisata[0]?.nama ?? 'Pantai Loji'}
+          src={finalWisata[0]?.img || '/images/curug_masigit.png'}
+          alt={finalWisata[0]?.nama ?? 'Curug Masigit'}
           class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
-        <div class="absolute inset-0 bg-gradient-to-t from-[#0A3650]/90 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#14532D]/90 to-transparent"></div>
         <div class="absolute bottom-0 p-6 text-white">
-          <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-accent/90">{finalWisata[0]?.tag ?? 'Pantai'}</span>
-          <h3 class="font-heading font-bold text-2xl mt-2">{finalWisata[0]?.nama ?? 'Pantai Loji'}</h3>
-          <p class="text-white/85 mt-1 max-w-md">{finalWisata[0]?.desc ?? 'Pasir, ombak selatan, dan matahari terbenam — titik awal menjelajah Geopark Ciletuh.'}</p>
+          <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-accent/90">{finalWisata[0]?.tag ?? 'Air Terjun'}</span>
+          <h3 class="font-heading font-bold text-2xl mt-2">{finalWisata[0]?.nama ?? 'Curug Masigit'}</h3>
+          <p class="text-white/85 mt-1 max-w-md">{finalWisata[0]?.desc ?? 'Air terjun eksotis di Kasomalang dengan air jernih hijau kebiruan dan tebing batu megah.'}</p>
         </div>
       </a>
       <!-- Two small cards (right) -->
       <div class="grid sm:grid-cols-2 gap-6">
-        <a href={`/wisata/${finalWisata[1]?.slug ?? 'kuil-dewi-kwan-im'}`}
-           class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_16px_32px_rgba(15,36,51,.16)] hover:border-accent transition-all">
+        <a href={`/wisata/${finalWisata[1]?.slug ?? 'ekowisata-alam-kasomalang'}`}
+           class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(16,35,26,.08)] hover:shadow-[0_16px_32px_rgba(16,35,26,.16)] hover:border-accent transition-all">
           <div class="aspect-[4/3] overflow-hidden">
             <img
-              src={finalWisata[1]?.img || '/images/karang_sari.png'}
-              alt={finalWisata[1]?.nama ?? 'Kuil Dewi Kwan Im'}
+              src={finalWisata[1]?.img || '/images/ekowisata_kasomalang.png'}
+              alt={finalWisata[1]?.nama ?? 'Ekowisata Alam Kasomalang'}
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
             />
           </div>
           <div class="p-5">
-            <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-[#E0F5F7] text-[#0A6B74]">{finalWisata[1]?.tag ?? 'Budaya'}</span>
-            <h3 class="font-heading font-bold text-lg text-ink mt-2 group-hover:text-primary transition-colors">{finalWisata[1]?.nama ?? 'Kuil Dewi Kwan Im'}</h3>
-            <p class="text-sm text-muted mt-1">{finalWisata[1]?.desc ?? 'Vihara Nam Hai Kwan Se Im Pu Sa, ikon pesisir Loji.'}</p>
+            <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-[#D1FAE5] text-[#047857]">{finalWisata[1]?.tag ?? 'Alam'}</span>
+            <h3 class="font-heading font-bold text-lg text-ink mt-2 group-hover:text-primary transition-colors">{finalWisata[1]?.nama ?? 'Ekowisata Alam Kasomalang'}</h3>
+            <p class="text-sm text-muted mt-1">{finalWisata[1]?.desc ?? 'Keindahan alam pegunungan yang asri dan menenangkan.'}</p>
           </div>
         </a>
-        <a href={`/wisata/${finalWisata[2]?.slug ?? 'geopark-ciletuh'}`}
-           class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_16px_32px_rgba(15,36,51,.16)] hover:border-accent transition-all">
+        <a href={`/wisata/${finalWisata[2]?.slug ?? 'panorama-sindangsari'}`}
+           class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(16,35,26,.08)] hover:shadow-[0_16px_32px_rgba(16,35,26,.16)] hover:border-accent transition-all">
           <div class="aspect-[4/3] overflow-hidden">
             <img
-              src={finalWisata[2]?.img || '/images/geopark_ciletuh.png'}
-              alt={finalWisata[2]?.nama ?? 'Geopark Ciletuh'}
+              src={finalWisata[2]?.img || '/images/hero_sindangsari.png'}
+              alt={finalWisata[2]?.nama ?? 'Panorama Sindangsari'}
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
             />
           </div>
           <div class="p-5">
-            <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-[#E0F5F7] text-[#0A6B74]">{finalWisata[2]?.tag ?? 'Alam'}</span>
-            <h3 class="font-heading font-bold text-lg text-ink mt-2 group-hover:text-primary transition-colors">{finalWisata[2]?.nama ?? 'Geopark Ciletuh'}</h3>
-            <p class="text-sm text-muted mt-1">{finalWisata[2]?.desc ?? 'Pintu masuk kawasan Geopark Ciletuh-Palabuhanratu.'}</p>
+            <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-[#D1FAE5] text-[#047857]">{finalWisata[2]?.tag ?? 'Panorama'}</span>
+            <h3 class="font-heading font-bold text-lg text-ink mt-2 group-hover:text-primary transition-colors">{finalWisata[2]?.nama ?? 'Panorama Sindangsari'}</h3>
+            <p class="text-sm text-muted mt-1">{finalWisata[2]?.desc ?? 'Pemandangan dataran tinggi yang memukau.'}</p>
           </div>
         </a>
       </div>
@@ -211,7 +211,7 @@ const finalBerita = beritaList.length > 0
 </section>
 
 <!-- ── UMKM Band ────────────────────────────────────────────── -->
-<section class="py-12 md:py-16" style="background-color: #0A3650;" aria-labelledby="umkm-heading">
+<section class="py-12 md:py-16" style="background-color: #14532D;" aria-labelledby="umkm-heading">
   <div class="mx-auto max-w-[1152px] px-4 sm:px-6">
     <div class="flex items-end justify-between mb-6">
       <div>
@@ -234,7 +234,7 @@ const finalBerita = beritaList.length > 0
                 loading="lazy"
               />
             ) : (
-              <div class="w-full h-full" style="background: linear-gradient(135deg, #0E9AA7, #15803D);"></div>
+              <div class="w-full h-full" style="background: linear-gradient(135deg, #059669, #15803D);"></div>
             )}
           </a>
           <div class="p-4 flex flex-col flex-1">
@@ -264,25 +264,25 @@ const finalBerita = beritaList.length > 0
   <!-- Background -->
   <div class="absolute inset-0">
     <img
-      src="/images/pantai_loji.png"
+      src="/images/hero_sindangsari.png"
       alt=""
       class="w-full h-full object-cover"
       aria-hidden="true"
       loading="lazy"
     />
-    <div class="absolute inset-0" style="background: linear-gradient(to right, rgba(10,54,80,0.92) 0%, rgba(10,54,80,0.75) 60%, rgba(10,54,80,0.5) 100%);"></div>
+    <div class="absolute inset-0" style="background: linear-gradient(to right, rgba(20,83,45,0.92) 0%, rgba(20,83,45,0.75) 60%, rgba(20,83,45,0.5) 100%);"></div>
   </div>
   <div class="relative mx-auto max-w-[1152px] px-4 sm:px-6">
     <div class="max-w-xl text-white">
       <span class="text-[13px] font-heading font-semibold text-accent uppercase tracking-widest">Peta Desa</span>
-      <h2 id="peta-heading" class="font-heading font-extrabold text-3xl sm:text-4xl mt-2">Temukan Semua yang Ada di Loji</h2>
+      <h2 id="peta-heading" class="font-heading font-extrabold text-3xl sm:text-4xl mt-2">Temukan Semua yang Ada di Sindangsari</h2>
       <p class="text-white/80 mt-3 leading-relaxed">
-        Jelajahi peta interaktif Desa Loji — titik wisata, UMKM, dan potensi alam ditandai langsung di peta. Klik penanda untuk detail dan rute.
+        Jelajahi peta interaktif Desa Sindangsari — titik wisata, UMKM, dan potensi alam ditandai langsung di peta. Klik penanda untuk detail dan rute.
       </p>
       <div class="flex flex-wrap gap-4 mt-6">
         {[
-          { icon: 'palmtree', label: '6 Wisata', color: '#0E9AA7' },
-          { icon: 'store', label: '12 UMKM', color: '#15803D' },
+          { icon: 'palmtree', label: '6 Wisata', color: '#2DD4BF' },
+          { icon: 'store', label: '12 UMKM', color: '#4ADE80' },
           { icon: 'sprout', label: '3 Potensi', color: '#F4EBDD' },
         ].map(item => (
           <span class="flex items-center gap-2 text-sm text-white/80">
@@ -291,7 +291,7 @@ const finalBerita = beritaList.length > 0
           </span>
         ))}
       </div>
-      <a href="/peta" class="inline-flex items-center gap-2 mt-6 bg-accent hover:bg-[#0a7d88] text-white font-heading font-semibold px-5 py-3 rounded-lg transition-colors min-h-[44px]">
+      <a href="/peta" class="inline-flex items-center gap-2 mt-6 bg-accent hover:bg-[#047857] text-white font-heading font-semibold px-5 py-3 rounded-lg transition-colors min-h-[44px]">
         <i data-lucide="map" class="w-5 h-5"></i> Buka Peta Interaktif
       </a>
     </div>
@@ -312,7 +312,7 @@ const finalBerita = beritaList.length > 0
     </div>
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
       {finalBerita.map(b => (
-        <a href={`/berita/${b.slug}`} class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_12px_24px_rgba(15,36,51,.12)] hover:border-accent transition-all">
+        <a href={`/berita/${b.slug}`} class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(16,35,26,.08)] hover:shadow-[0_12px_24px_rgba(16,35,26,.12)] hover:border-accent transition-all">
           <div class="aspect-[16/9] overflow-hidden">
             {b.img ? (
               <img
@@ -322,7 +322,7 @@ const finalBerita = beritaList.length > 0
                 loading="lazy"
               />
             ) : (
-              <div class="w-full h-full" style="background: linear-gradient(135deg, #0E4A6E 0%, #0E9AA7 60%, #3FB5BF 100%);"></div>
+              <div class="w-full h-full" style="background: linear-gradient(135deg, #166534 0%, #059669 60%, #34D399 100%);"></div>
             )}
           </div>
           <div class="p-5">

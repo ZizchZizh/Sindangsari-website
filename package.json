@@ -1,11 +1,11 @@
 {
-  "name": "web-desa-loji",
+  "name": "web-desa-sindangsari",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "astro build && wrangler dev",
-    "db:setup": "wrangler d1 execute web-desa-loji-db --local --file=migrations/0001_schema.sql && wrangler d1 execute web-desa-loji-db --local --file=migrations/0002_seed.sql",
+    "db:setup": "wrangler d1 execute web-desa-sindangsari-db --local --file=migrations/0001_schema.sql && wrangler d1 execute web-desa-sindangsari-db --local --file=migrations/0002_seed.sql",
     "build": "astro build",
     "astro": "astro",
     "deploy": "astro build && wrangler deploy"

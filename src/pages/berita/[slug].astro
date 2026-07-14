@@ -14,17 +14,17 @@ const coverMedia = berita.cover_media_id && env
   ? (await env.DB.prepare('SELECT * FROM media WHERE id = ?').bind(berita.cover_media_id).first<{r2_key_display:string;alt:string}>())
   : null;
 
-const canonicalUrl = new URL(`/berita/${slug}`, Astro.site ?? 'https://desaloji.desa.id').href;
+const canonicalUrl = new URL(`/berita/${slug}`, Astro.site ?? 'https://sindangsari.web.id').href;
 ---
 
 <Layout
-  title={`${berita.judul} — Berita Desa Loji`}
+  title={`${berita.judul} — Berita Desa Sindangsari`}
   description={berita.content_html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').slice(0,160)}
   ogImage={coverMedia ? `/api/media/${encodeURIComponent(coverMedia.r2_key_display)}` : undefined}
 >
 
   <!-- Header -->
-  <div class="py-10 md:py-12" style="background:linear-gradient(135deg,#0E4A6E,#0A3650);">
+  <div class="py-10 md:py-12" style="background:linear-gradient(135deg,#166534,#14532D);">
     <div class="mx-auto max-w-6xl px-4 md:px-6 text-white">
       <nav aria-label="Breadcrumb" class="text-sm mb-3 opacity-75">
         <a href="/" class="hover:underline">Beranda</a> /
@@ -43,7 +43,7 @@ const canonicalUrl = new URL(`/berita/${slug}`, Astro.site ?? 'https://desaloji.
       </h1>
       <p class="text-text-muted text-sm">
         Diterbitkan: {berita.published_at ? formatTanggal(berita.published_at) : ''}
-        &nbsp;·&nbsp; Pemerintah Desa Loji
+        &nbsp;·&nbsp; Pemerintah Desa Sindangsari
       </p>
     </header>
 

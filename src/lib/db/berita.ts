@@ -1,6 +1,7 @@
 import { toSlug } from './wisata';
+import type { WithCover } from './media';
 
-export interface Berita {
+export interface Berita extends WithCover {
   id: number;
   slug: string;
   judul: string;
@@ -12,24 +13,28 @@ export interface Berita {
   updated_at: string;
 }
 
+// Sampul di-JOIN dalam query yang sama agar halaman daftar tidak N+1.
+const SEL = `SELECT b.*, m.r2_key_display AS cover_key, m.r2_key_thumb AS cover_thumb_key, m.alt AS cover_alt
+             FROM berita b LEFT JOIN media m ON m.id = b.cover_media_id`;
+
 export async function getPublishedBerita(db: D1Database, limit = 100): Promise<Berita[]> {
   const r = await db
-    .prepare("SELECT * FROM berita WHERE status='published' ORDER BY published_at DESC LIMIT ?")
+    .prepare(`${SEL} WHERE b.status='published' ORDER BY b.published_at DESC LIMIT ?`)
     .bind(limit).all<Berita>();
   return r.results;
 }
 
 export async function getBeritaBySlug(slug: string, db: D1Database): Promise<Berita | null> {
-  return db.prepare("SELECT * FROM berita WHERE slug=? AND status='published'").bind(slug).first<Berita>();
+  return db.prepare(`${SEL} WHERE b.slug=? AND b.status='published'`).bind(slug).first<Berita>();
 }
 
 export async function getAllBerita(db: D1Database): Promise<Berita[]> {
-  const r = await db.prepare('SELECT * FROM berita ORDER BY updated_at DESC').all<Berita>();
+  const r = await db.prepare(`${SEL} ORDER BY b.updated_at DESC`).all<Berita>();
   return r.results;
 }
 
 export async function getBeritaById(id: number, db: D1Database): Promise<Berita | null> {
-  return db.prepare('SELECT * FROM berita WHERE id=?').bind(id).first<Berita>();
+  return db.prepare(`${SEL} WHERE b.id=?`).bind(id).first<Berita>();
 }
 
 export function formatTanggal(iso: string): string {

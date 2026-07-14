@@ -1,6 +1,8 @@
 ---
 import AdminLayout from '../../../components/AdminLayout.astro';
+import MediaInput from '../../../components/MediaInput.astro';
 import { getUmkmById } from '../../../lib/db/umkm';
+import { mediaUrl } from '../../../lib/db/media';
 
 const { id } = Astro.params as { id: string };
 import { getEnv } from '@lib/env';
@@ -52,6 +54,13 @@ const categories = ['Kuliner', 'Kriya', 'Jasa', 'Hasil Tani'];
           class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
           style="border-color:var(--color-border); min-height:44px;" />
       </div>
+
+      <MediaInput
+        mediaId={umkm.cover_media_id}
+        previewUrl={umkm.cover_key ? mediaUrl(umkm.cover_key) : null}
+        label="Foto Produk"
+        hint="Foto utama UMKM ini — tampil di direktori dan halaman detail."
+      />
 
       <div>
         <label class="block font-heading font-medium text-sm mb-1.5">Deskripsi</label>

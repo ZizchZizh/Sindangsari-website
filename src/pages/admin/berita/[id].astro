@@ -1,6 +1,8 @@
 ---
 import AdminLayout from '../../../components/AdminLayout.astro';
+import MediaInput from '../../../components/MediaInput.astro';
 import { getBeritaById } from '../../../lib/db/berita';
+import { mediaUrl } from '../../../lib/db/media';
 
 const { id } = Astro.params as { id: string };
 import { getEnv } from '@lib/env';
@@ -39,6 +41,11 @@ const published = Astro.url.searchParams.get('published');
           class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
           style="border-color:var(--color-border); min-height:44px;" />
       </div>
+
+      <MediaInput
+        mediaId={berita.cover_media_id}
+        previewUrl={berita.cover_key ? mediaUrl(berita.cover_key) : null}
+      />
 
       <div>
         <label class="block font-heading font-medium text-sm mb-1.5">
@@ -111,8 +118,10 @@ const published = Astro.url.searchParams.get('published');
     });
   });
 
+  // requestSubmit(), bukan submit(): submit() TIDAK memicu event 'submit',
+  // sehingga penjaga "tunggu unggahan foto selesai" di MediaInput terlewat.
   document.getElementById('btn-draft')?.addEventListener('click', () => {
-    hidden.value = editor.innerHTML; actionInput.value = 'draft'; form.submit();
+    hidden.value = editor.innerHTML; actionInput.value = 'draft'; form.requestSubmit();
   });
   document.getElementById('btn-publish')?.addEventListener('click', () => {
     const judul = (document.getElementById('judul') as HTMLInputElement).value.trim();
@@ -120,6 +129,6 @@ const published = Astro.url.searchParams.get('published');
     if (!judul || !isi) {
       alert('Judul dan isi berita wajib diisi sebelum diterbitkan.'); return;
     }
-    hidden.value = editor.innerHTML; actionInput.value = 'publish'; form.submit();
+    hidden.value = editor.innerHTML; actionInput.value = 'publish'; form.requestSubmit();
   });
 </script>

@@ -1,6 +1,7 @@
 import { getEnv } from '@lib/env';
 import type { APIRoute } from 'astro';
 import { createBerita } from '../../../../lib/db/berita';
+import { parseCoverId } from '../../../../lib/forms/cover';
 import { purgeCache } from '../../../../lib/cache/purge';
 
 export const POST: APIRoute = async ({ request, locals, redirect }) => {
@@ -16,7 +17,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   }
   if (!judul || !env) return redirect('/admin/berita/new?errors=Judul+belum+diisi.');
 
-  const { id, slug } = await createBerita({ judul, content_html, cover_media_id: null, status }, env.DB);
+  const { id, slug } = await createBerita({ judul, content_html, cover_media_id: parseCoverId(fd), status }, env.DB);
   await purgeCache(['/berita', `/berita/${slug}`, '/']);
   const qs = status === 'published' ? 'published=1' : 'saved=1';
   return redirect(`/admin/berita/${id}?${qs}`);

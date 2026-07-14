@@ -1,6 +1,7 @@
 ---
 import Layout from '../../components/Layout.astro';
 import { getPublishedUmkm } from '../../lib/db/umkm';
+import { mediaUrl } from '../../lib/db/media';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
@@ -28,9 +29,21 @@ const getUmkmImg = (slug: string) => {
   return '/images/kerupuk_tradisional.png';
 };
 
+// URL sampul dihitung di server lalu di-serialize ke klien (field `img`),
+// jadi kartu yang dibangun di browser tidak perlu memanggil mediaUrl.
+// Berjenjang: sampul DB → peta slug lama (data seed) → placeholder generik.
 const displayUmkm = allUmkm.length > 0
-  ? allUmkm.map(u => ({ slug: u.slug, nama: u.nama, kategori: u.kategori, lokasi: u.lokasi ?? '', img: getUmkmImg(u.slug), wa_number: u.wa_number ?? null, desc: '' }))
-  : demoUmkm;
+  ? allUmkm.map(u => ({
+      slug: u.slug,
+      nama: u.nama,
+      kategori: u.kategori,
+      lokasi: u.lokasi ?? '',
+      img: u.cover_key ? mediaUrl(u.cover_key) : getUmkmImg(u.slug),
+      alt: u.cover_alt || u.nama,
+      wa_number: u.wa_number ?? null,
+      desc: '',
+    }))
+  : demoUmkm.map(u => ({ ...u, alt: u.nama }));
 
 const displayJson = JSON.stringify(displayUmkm);
 const totalCount = displayUmkm.length;
@@ -109,10 +122,13 @@ const totalCount = displayUmkm.length;
   const countEl = document.getElementById('count');
   const emptyEl = document.getElementById('empty');
 
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
   function cardHTML(u) {
     const tagColor = TAG_COLOR[u.kategori] ?? TAG_COLOR['default'];
+    // u.img sudah berisi URL sampul dari DB (atau fallback) yang dihitung di server.
     const imgHTML = u.img
-      ? `<img src="${u.img}" alt="${u.nama}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />`
+      ? `<img src="${esc(u.img)}" alt="${esc(u.alt || u.nama)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />`
       : `<div class="w-full h-full" style="background: linear-gradient(135deg, #166534, #059669);"></div>`;
     const contactHTML = u.wa_number
       ? `<a href="https://wa.me/${u.wa_number}" target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center justify-center gap-2 w-full bg-cta hover:bg-ctaDark text-white text-sm font-heading font-semibold py-2.5 rounded-lg transition-colors min-h-[44px]"><i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp</a>`

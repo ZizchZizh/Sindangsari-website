@@ -1,6 +1,8 @@
 ---
 import AdminLayout from '../../../components/AdminLayout.astro';
+import MediaInput from '../../../components/MediaInput.astro';
 import { getWisataById } from '../../../lib/db/wisata';
+import { mediaUrl } from '../../../lib/db/media';
 
 const { id } = Astro.params as { id: string };
 import { getEnv } from '@lib/env';
@@ -32,6 +34,11 @@ const saved = Astro.url.searchParams.get('saved');
           class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
           style="border-color:var(--color-border); min-height:44px;" />
       </div>
+
+      <MediaInput
+        mediaId={wisata.cover_media_id}
+        previewUrl={wisata.cover_key ? mediaUrl(wisata.cover_key) : null}
+      />
 
       <div>
         <label for="deskripsi_html" class="block font-heading font-medium text-sm mb-1.5">Deskripsi</label>

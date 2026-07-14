@@ -1,7 +1,7 @@
 ---
 import Layout from '../../components/Layout.astro';
 import { getWisataBySlug } from '../../lib/db/wisata';
-import { getMediaForEntity } from '../../lib/db/media';
+import { getMediaForEntity, mediaUrl } from '../../lib/db/media';
 
 const { slug } = Astro.params as { slug: string };
 import { getEnv } from '@lib/env';
@@ -11,13 +11,33 @@ const wisata = env ? await getWisataBySlug(slug, env.DB) : null;
 if (!wisata) return Astro.redirect('/404');
 
 const mediaList = env ? await getMediaForEntity('wisata', wisata.id, env.DB) : [];
-const coverImage = mediaList[0];
+
+// Peta slug lama — hanya untuk data seed yang belum punya foto sampul di DB.
+const getWisataImg = (s: string): string | null => {
+  if (s === 'curug-masigit') return '/images/curug_masigit.png';
+  if (s === 'ekowisata-alam-kasomalang') return '/images/ekowisata_kasomalang.png';
+  return null;
+};
+
+// Sumber gambar berjenjang: sampul DB → media tertaut → peta slug lama → placeholder huruf.
+const linkedCover = wisata.cover_key ? null : mediaList[0];
+const coverSrc = wisata.cover_key
+  ? mediaUrl(wisata.cover_key)
+  : linkedCover
+    ? mediaUrl(linkedCover.r2_key_display)
+    : getWisataImg(wisata.slug);
+const coverAlt = wisata.cover_alt || linkedCover?.alt || wisata.nama;
+
+// Galeri: semua media tertaut kecuali yang sudah dipakai sebagai sampul.
+const galleryList = wisata.cover_key
+  ? mediaList.filter(m => m.id !== wisata.cover_media_id)
+  : mediaList.slice(1);
 ---
 
 <Layout
   title={`${wisata.nama} — Wisata Desa Sindangsari`}
   description={wisata.deskripsi_html.replace(/<[^>]+>/g, '').slice(0, 160)}
-  ogImage={coverImage ? `/api/media/${encodeURIComponent(coverImage.r2_key_display)}` : undefined}
+  ogImage={coverSrc ?? undefined}
 >
 
   <!-- Header -->
@@ -35,11 +55,11 @@ const coverImage = mediaList[0];
   <div class="mx-auto max-w-6xl px-4 md:px-6 py-12">
 
     <!-- Cover image -->
-    {coverImage ? (
+    {coverSrc ? (
       <div class="aspect-[16/7] rounded-xl overflow-hidden mb-8 border border-border" style="box-shadow:var(--shadow-md);">
         <img
-          src={`/api/media/${encodeURIComponent(coverImage.r2_key_display)}`}
-          alt={coverImage.alt}
+          src={coverSrc}
+          alt={coverAlt}
           class="w-full h-full object-cover"
           loading="lazy"
         />
@@ -54,13 +74,13 @@ const coverImage = mediaList[0];
     <div class="prose max-w-none mb-8" set:html={wisata.deskripsi_html} />
 
     <!-- Gallery -->
-    {mediaList.length > 1 && (
+    {galleryList.length > 0 && (
       <div class="mb-8">
         <h2 class="font-heading font-semibold text-xl mb-4" style="color:var(--color-primary);">Galeri Foto</h2>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {mediaList.slice(1).map(m => (
+          {galleryList.map(m => (
             <div class="aspect-[4/3] rounded-lg overflow-hidden border border-border">
-              <img src={`/api/media/${encodeURIComponent(m.r2_key_display)}`} alt={m.alt}
+              <img src={mediaUrl(m.r2_key_display)} alt={m.alt}
                 class="w-full h-full object-cover" loading="lazy" />
             </div>
           ))}

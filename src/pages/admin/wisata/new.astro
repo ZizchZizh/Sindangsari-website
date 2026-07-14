@@ -1,5 +1,6 @@
 ---
 import AdminLayout from '../../../components/AdminLayout.astro';
+import MediaInput from '../../../components/MediaInput.astro';
 const error = Astro.url.searchParams.get('error');
 ---
 
@@ -26,6 +27,8 @@ const error = Astro.url.searchParams.get('error');
           placeholder="cth. Curug Masigit" />
         <p id="nama-error" class="text-red-600 text-xs mt-1 hidden" role="alert">Nama wisata belum diisi.</p>
       </div>
+
+      <MediaInput />
 
       <div>
         <label for="deskripsi_html" class="block font-heading font-medium text-sm mb-1.5">Deskripsi</label>

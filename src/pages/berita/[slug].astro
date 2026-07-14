@@ -1,7 +1,7 @@
 ---
 import Layout from '../../components/Layout.astro';
 import { getBeritaBySlug, formatTanggal } from '../../lib/db/berita';
-import { getMediaForEntity } from '../../lib/db/media';
+import { mediaUrl } from '../../lib/db/media';
 
 const { slug } = Astro.params as { slug: string };
 import { getEnv } from '@lib/env';
@@ -10,9 +10,9 @@ const env = getEnv();
 const berita = env ? await getBeritaBySlug(slug, env.DB) : null;
 if (!berita) return Astro.redirect('/404');
 
-const coverMedia = berita.cover_media_id && env
-  ? (await env.DB.prepare('SELECT * FROM media WHERE id = ?').bind(berita.cover_media_id).first<{r2_key_display:string;alt:string}>())
-  : null;
+// Sampul sudah ikut di-JOIN oleh getBeritaBySlug — tak perlu query tambahan.
+const coverSrc = berita.cover_key ? mediaUrl(berita.cover_key) : null;
+const coverAlt = berita.cover_alt || berita.judul;
 
 const canonicalUrl = new URL(`/berita/${slug}`, Astro.site ?? 'https://sindangsari.web.id').href;
 ---
@@ -20,7 +20,7 @@ const canonicalUrl = new URL(`/berita/${slug}`, Astro.site ?? 'https://sindangsa
 <Layout
   title={`${berita.judul} — Berita Desa Sindangsari`}
   description={berita.content_html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').slice(0,160)}
-  ogImage={coverMedia ? `/api/media/${encodeURIComponent(coverMedia.r2_key_display)}` : undefined}
+  ogImage={coverSrc ?? undefined}
 >
 
   <!-- Header -->
@@ -48,11 +48,11 @@ const canonicalUrl = new URL(`/berita/${slug}`, Astro.site ?? 'https://sindangsa
     </header>
 
     <!-- Cover image -->
-    {coverMedia && (
+    {coverSrc && (
       <div class="aspect-[16/8] rounded-xl overflow-hidden mb-8 border border-border" style="box-shadow:var(--shadow-md);">
         <img
-          src={`/api/media/${encodeURIComponent(coverMedia.r2_key_display)}`}
-          alt={coverMedia.alt}
+          src={coverSrc}
+          alt={coverAlt}
           class="w-full h-full object-cover"
           loading="lazy"
         />

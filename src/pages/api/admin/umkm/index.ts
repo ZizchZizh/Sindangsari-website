@@ -1,6 +1,7 @@
 import { getEnv } from '@lib/env';
 import type { APIRoute } from 'astro';
 import { createUmkm } from '../../../../lib/db/umkm';
+import { parseCoverId } from '../../../../lib/forms/cover';
 import { purgeCache } from '../../../../lib/cache/purge';
 
 export const POST: APIRoute = async ({ request, locals, redirect }) => {
@@ -18,6 +19,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
     telepon: (fd.get('telepon') as string) || null,
     google_maps_url: (fd.get('google_maps_url') as string) || null,
     qris_r2_key: null,
+    cover_media_id: parseCoverId(fd),
     toko_online_url: (fd.get('toko_online_url') as string) || null,
     status: (fd.get('status') as string) ?? 'draft',
   } as any;

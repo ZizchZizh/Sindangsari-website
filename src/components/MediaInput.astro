@@ -1,0 +1,162 @@
+---
+/**
+ * Pemilih foto sampul — dipakai bersama oleh form Wisata, UMKM, dan Berita.
+ *
+ * Cara kerja: begitu operator memilih berkas, gambar langsung dikecilkan di
+ * browser lalu diunggah ke /api/admin/media (fetch). Yang ikut ter-submit
+ * bersama form hanyalah `cover_media_id` (hidden input) — jadi form entitas
+ * tetap berupa POST form biasa, tanpa multipart.
+ */
+interface Props {
+  /** id media yang sudah terpasang (mode sunting). */
+  mediaId?: number | null;
+  /** URL pratinjau foto yang sudah ada. */
+  previewUrl?: string | null;
+  label?: string;
+  hint?: string;
+}
+
+const {
+  mediaId = null,
+  previewUrl = null,
+  label = 'Foto Sampul',
+  hint = 'Tampil di halaman daftar dan detail. Gambar otomatis dikecilkan sebelum diunggah.',
+} = Astro.props;
+---
+
+<div class="media-input" data-media-input>
+  <span class="block font-heading font-medium text-sm mb-1.5">{label}</span>
+  <p class="text-xs text-text-muted mb-2">{hint}</p>
+
+  <!-- Nilai yang benar-benar dikirim bersama form -->
+  <input type="hidden" name="cover_media_id" data-media-id value={mediaId ? String(mediaId) : ''} />
+
+  <div class="flex items-start gap-4">
+    <!-- Pratinjau -->
+    <div
+      data-media-preview-wrap
+      class="shrink-0 rounded-lg border overflow-hidden grid place-items-center"
+      style="width:132px; height:99px; border-color:var(--color-border); background:#F8FAFC;"
+    >
+      <img
+        data-media-preview
+        src={previewUrl ?? ''}
+        alt=""
+        class:list={['w-full h-full object-cover', previewUrl ? '' : 'hidden']}
+      />
+      <span data-media-empty class:list={['text-xs text-text-muted px-2 text-center', previewUrl ? 'hidden' : '']}>
+        Belum ada foto
+      </span>
+    </div>
+
+    <div class="flex-1 min-w-0">
+      <label
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-heading font-medium text-sm border cursor-pointer hover:bg-sand"
+        style="border-color:var(--color-primary); color:var(--color-primary); min-height:44px;"
+      >
+        <input type="file" accept="image/*" class="sr-only" data-media-file />
+        <span data-media-btn-label>{previewUrl ? 'Ganti Foto' : 'Pilih Foto'}</span>
+      </label>
+
+      <button
+        type="button"
+        data-media-remove
+        class:list={[
+          'ml-2 px-3 py-2 rounded-lg font-heading font-medium text-sm border cursor-pointer hover:bg-red-50',
+          previewUrl ? '' : 'hidden',
+        ]}
+        style="border-color:#FECACA; color:#DC2626; min-height:44px;"
+      >
+        Hapus Foto
+      </button>
+
+      <p data-media-status class="text-xs mt-2 hidden" role="status" aria-live="polite"></p>
+      <p data-media-error class="text-xs mt-2 hidden" role="alert" style="color:#B91C1C;"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { uploadImage } from '../lib/media/client-upload';
+
+  document.querySelectorAll<HTMLElement>('[data-media-input]').forEach((root) => {
+    const fileInput = root.querySelector<HTMLInputElement>('[data-media-file]')!;
+    const hidden = root.querySelector<HTMLInputElement>('[data-media-id]')!;
+    const preview = root.querySelector<HTMLImageElement>('[data-media-preview]')!;
+    const empty = root.querySelector<HTMLElement>('[data-media-empty]')!;
+    const btnLabel = root.querySelector<HTMLElement>('[data-media-btn-label]')!;
+    const removeBtn = root.querySelector<HTMLButtonElement>('[data-media-remove]')!;
+    const status = root.querySelector<HTMLElement>('[data-media-status]')!;
+    const error = root.querySelector<HTMLElement>('[data-media-error]')!;
+
+    // Form tidak boleh di-submit selagi gambar masih diunggah — kalau tidak,
+    // cover_media_id akan tersimpan kosong tanpa disadari operator.
+    const form = root.closest('form');
+    let sedangUnggah = false;
+
+    form?.addEventListener('submit', (e) => {
+      if (sedangUnggah) {
+        e.preventDefault();
+        tampilkanGalat('Tunggu sampai unggahan foto selesai.');
+      }
+    });
+
+    function tampilkanGalat(pesan: string) {
+      error.textContent = pesan;
+      error.classList.remove('hidden');
+      status.classList.add('hidden');
+    }
+
+    function bersihkanPesan() {
+      error.classList.add('hidden');
+      status.classList.add('hidden');
+    }
+
+    function pasangFoto(url: string, id: number) {
+      hidden.value = String(id);
+      preview.src = url;
+      preview.classList.remove('hidden');
+      empty.classList.add('hidden');
+      removeBtn.classList.remove('hidden');
+      btnLabel.textContent = 'Ganti Foto';
+    }
+
+    function lepasFoto() {
+      hidden.value = '';
+      preview.src = '';
+      preview.classList.add('hidden');
+      empty.classList.remove('hidden');
+      removeBtn.classList.add('hidden');
+      btnLabel.textContent = 'Pilih Foto';
+    }
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files?.[0];
+      if (!file) return;
+
+      bersihkanPesan();
+      sedangUnggah = true;
+      status.textContent = 'Mengunggah foto…';
+      status.classList.remove('hidden');
+
+      try {
+        const media = await uploadImage(file);
+        pasangFoto(media.url, media.id);
+        status.textContent = 'Foto berhasil diunggah.';
+      } catch (err) {
+        tampilkanGalat(err instanceof Error ? err.message : 'Gagal mengunggah foto.');
+      } finally {
+        sedangUnggah = false;
+        fileInput.value = ''; // izinkan memilih berkas yang sama lagi
+      }
+    });
+
+    // Melepas sampul di sini hanya memutus tautannya dari entitas ini.
+    // Berkasnya tetap ada di pustaka Media — sengaja, agar tidak menghapus
+    // gambar yang mungkin dipakai entitas lain.
+    removeBtn.addEventListener('click', () => {
+      lepasFoto();
+      bersihkanPesan();
+    });
+  });
+</script>

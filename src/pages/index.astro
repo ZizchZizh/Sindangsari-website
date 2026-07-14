@@ -3,6 +3,7 @@ import Layout from '../components/Layout.astro';
 import { getPublishedWisata } from '../lib/db/wisata';
 import { getPublishedUmkm } from '../lib/db/umkm';
 import { getPublishedBerita, formatTanggal, excerpt } from '../lib/db/berita';
+import { mediaUrl } from '../lib/db/media';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
@@ -45,17 +46,22 @@ const getUmkmImg = (slug: string) => {
   return '/images/kerupuk_tradisional.png';
 };
 
+// Sumber gambar berjenjang: sampul dari DB → peta slug lama (data seed) → placeholder generik.
+const coverOr = (cover_key: string | null | undefined, fallback: string) =>
+  cover_key ? mediaUrl(cover_key) : fallback;
+const altOr = (cover_alt: string | null | undefined, nama: string) => cover_alt || nama;
+
 const finalWisata = wisataList.length > 0
-  ? wisataList.slice(0, 3).map(w => ({ slug: w.slug, nama: w.nama, img: getWisataImg(w.slug), tag: 'Wisata', desc: excerpt(w.deskripsi_html, 100) }))
-  : demoWisata;
+  ? wisataList.slice(0, 3).map(w => ({ slug: w.slug, nama: w.nama, img: coverOr(w.cover_key, getWisataImg(w.slug)), alt: altOr(w.cover_alt, w.nama), tag: 'Wisata', desc: excerpt(w.deskripsi_html, 100) }))
+  : demoWisata.map(w => ({ ...w, alt: w.nama }));
 
 const finalUmkm = umkmList.length > 0
-  ? umkmList.slice(0, 4).map(u => ({ slug: u.slug, nama: u.nama, kategori: u.kategori, img: getUmkmImg(u.slug), wa: u.wa_number ?? null, desc: u.deskripsi_html ? excerpt(u.deskripsi_html, 80) : '' }))
-  : demoUmkm;
+  ? umkmList.slice(0, 4).map(u => ({ slug: u.slug, nama: u.nama, kategori: u.kategori, img: coverOr(u.cover_key, getUmkmImg(u.slug)), alt: altOr(u.cover_alt, u.nama), wa: u.wa_number ?? null, desc: u.deskripsi_html ? excerpt(u.deskripsi_html, 80) : '' }))
+  : demoUmkm.map(u => ({ ...u, alt: u.nama }));
 
 const finalBerita = beritaList.length > 0
-  ? beritaList.map(b => ({ slug: b.slug, judul: b.judul, published_at: b.published_at ?? '', img: '/images/gotong_royong.png', ringkasan: excerpt(b.content_html, 120) }))
-  : demoBerita;
+  ? beritaList.map(b => ({ slug: b.slug, judul: b.judul, published_at: b.published_at ?? '', img: coverOr(b.cover_key, '/images/gotong_royong.png'), alt: altOr(b.cover_alt, b.judul), ringkasan: excerpt(b.content_html, 120) }))
+  : demoBerita.map(b => ({ ...b, alt: b.judul }));
 ---
 
 <Layout
@@ -160,7 +166,7 @@ const finalBerita = beritaList.length > 0
          class="group relative block rounded-2xl overflow-hidden h-80 lg:h-full min-h-[20rem] shadow-[0_4px_10px_rgba(16,35,26,.08)] hover:shadow-[0_16px_32px_rgba(16,35,26,.16)] transition-shadow">
         <img
           src={finalWisata[0]?.img || '/images/curug_masigit.png'}
-          alt={finalWisata[0]?.nama ?? 'Curug Masigit'}
+          alt={finalWisata[0]?.alt ?? 'Curug Masigit'}
           class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
@@ -178,7 +184,7 @@ const finalBerita = beritaList.length > 0
           <div class="aspect-[4/3] overflow-hidden">
             <img
               src={finalWisata[1]?.img || '/images/ekowisata_kasomalang.png'}
-              alt={finalWisata[1]?.nama ?? 'Ekowisata Alam Kasomalang'}
+              alt={finalWisata[1]?.alt ?? 'Ekowisata Alam Kasomalang'}
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
             />
@@ -194,7 +200,7 @@ const finalBerita = beritaList.length > 0
           <div class="aspect-[4/3] overflow-hidden">
             <img
               src={finalWisata[2]?.img || '/images/hero_sindangsari.png'}
-              alt={finalWisata[2]?.nama ?? 'Panorama Sindangsari'}
+              alt={finalWisata[2]?.alt ?? 'Panorama Sindangsari'}
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
             />
@@ -229,7 +235,7 @@ const finalBerita = beritaList.length > 0
             {u.img ? (
               <img
                 src={u.img}
-                alt={u.nama}
+                alt={u.alt}
                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                 loading="lazy"
               />
@@ -317,7 +323,7 @@ const finalBerita = beritaList.length > 0
             {b.img ? (
               <img
                 src={b.img}
-                alt={b.judul}
+                alt={b.alt}
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
               />

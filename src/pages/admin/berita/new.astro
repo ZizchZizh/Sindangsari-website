@@ -1,5 +1,6 @@
 ---
 import AdminLayout from '../../../components/AdminLayout.astro';
+import MediaInput from '../../../components/MediaInput.astro';
 const errors = Astro.url.searchParams.get('errors')?.split(',') ?? [];
 ---
 
@@ -30,6 +31,8 @@ const errors = Astro.url.searchParams.get('errors')?.split(',') ?? [];
           placeholder="Judul singkat dan jelas" />
         <p id="judul-error" class="text-red-600 text-xs mt-1 hidden" role="alert">Judul belum diisi.</p>
       </div>
+
+      <MediaInput />
 
       <div>
         <label class="block font-heading font-medium text-sm mb-1.5">
@@ -139,13 +142,15 @@ const errors = Astro.url.searchParams.get('errors')?.split(',') ?? [];
       }
     }
     actionInput.value = action;
-    form.submit();
+    // requestSubmit(), bukan submit(): submit() TIDAK memicu event 'submit',
+    // sehingga penjaga "tunggu unggahan foto selesai" di MediaInput terlewat.
+    form.requestSubmit();
   }
 
   document.getElementById('btn-draft')?.addEventListener('click', () => {
     hidden.value = editor.innerHTML;
     actionInput.value = 'draft';
-    form.submit();
+    form.requestSubmit();
   });
   document.getElementById('btn-publish')?.addEventListener('click', () => validateAndSubmit('publish'));
 </script>

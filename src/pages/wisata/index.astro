@@ -2,6 +2,7 @@
 import Layout from '../../components/Layout.astro';
 import { getPublishedWisata } from '../../lib/db/wisata';
 import { excerpt } from '../../lib/db/berita';
+import { mediaUrl } from '../../lib/db/media';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
@@ -22,9 +23,17 @@ const getWisataImg = (slug: string) => {
   return '/images/hero_sindangsari.png';
 };
 
+// Sumber gambar berjenjang: sampul dari DB → peta slug lama (data seed) → placeholder generik.
 const displayList = wisataList.length > 0
-  ? wisataList.map(w => ({ slug: w.slug, nama: w.nama, deskripsi_html: w.deskripsi_html, img: getWisataImg(w.slug), tag: 'Wisata' }))
-  : demoWisata;
+  ? wisataList.map(w => ({
+      slug: w.slug,
+      nama: w.nama,
+      deskripsi_html: w.deskripsi_html,
+      img: w.cover_key ? mediaUrl(w.cover_key) : getWisataImg(w.slug),
+      alt: w.cover_alt || w.nama,
+      tag: 'Wisata',
+    }))
+  : demoWisata.map(w => ({ ...w, alt: w.nama }));
 ---
 
 <Layout
@@ -63,7 +72,7 @@ const displayList = wisataList.length > 0
           {w.img ? (
             <img
               src={w.img}
-              alt={w.nama}
+              alt={w.alt}
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
             />

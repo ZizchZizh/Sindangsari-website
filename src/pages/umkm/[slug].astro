@@ -1,7 +1,7 @@
 ---
 import Layout from '../../components/Layout.astro';
 import { getUmkmBySlug } from '../../lib/db/umkm';
-import { getMediaForEntity } from '../../lib/db/media';
+import { getMediaForEntity, mediaUrl } from '../../lib/db/media';
 
 const { slug } = Astro.params as { slug: string };
 import { getEnv } from '@lib/env';
@@ -11,14 +11,37 @@ const umkm = env ? await getUmkmBySlug(slug, env.DB) : null;
 if (!umkm) return Astro.redirect('/404');
 
 const mediaList = env ? await getMediaForEntity('umkm', umkm.id, env.DB) : [];
-const cover = mediaList[0];
+
+// Peta slug lama — hanya untuk data seed yang belum punya foto sampul di DB.
+const getUmkmImg = (s: string): string | null => {
+  if (s === 'kerupuk-opak-ranginang') return '/images/kerupuk_tradisional.png';
+  if (s === 'kopi-aren-kasomalang') return '/images/kopi_aren.png';
+  if (s === 'keripik-bonggol-pisang') return '/images/keripik_bonggol.png';
+  return null;
+};
+
+// Sumber gambar berjenjang: sampul DB → media tertaut → peta slug lama → placeholder huruf.
+const linkedCover = umkm.cover_key ? null : mediaList[0];
+const coverSrc = umkm.cover_key
+  ? mediaUrl(umkm.cover_key)
+  : linkedCover
+    ? mediaUrl(linkedCover.r2_key_display)
+    : getUmkmImg(umkm.slug);
+const coverAlt = umkm.cover_alt || linkedCover?.alt || umkm.nama;
+
+// Galeri: media tertaut kecuali yang sudah dipakai sebagai sampul.
+const galleryList = (umkm.cover_key
+  ? mediaList.filter(m => m.id !== umkm.cover_media_id)
+  : mediaList.slice(1)
+).slice(0, 6);
+
 const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? 'https://sindangsari.web.id').href;
 ---
 
 <Layout
   title={`${umkm.nama} — UMKM Desa Sindangsari`}
   description={`${umkm.nama} · ${umkm.kategori} · ${umkm.lokasi ?? 'Desa Sindangsari'}`}
-  ogImage={cover ? `/api/media/${encodeURIComponent(cover.r2_key_display)}` : undefined}
+  ogImage={coverSrc ?? undefined}
 >
 
   <!-- Header -->
@@ -40,9 +63,9 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? 'https://sindangsari
       <!-- Left: gallery + description + location -->
       <div>
         <!-- Cover image -->
-        {cover ? (
+        {coverSrc ? (
           <div class="aspect-[16/10] rounded-xl overflow-hidden mb-6 border border-border" style="box-shadow:var(--shadow-md);">
-            <img src={`/api/media/${encodeURIComponent(cover.r2_key_display)}`} alt={cover.alt}
+            <img src={coverSrc} alt={coverAlt}
               class="w-full h-full object-cover" loading="lazy" />
           </div>
         ) : (
@@ -52,11 +75,11 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? 'https://sindangsari
         )}
 
         <!-- Gallery -->
-        {mediaList.length > 1 && (
+        {galleryList.length > 0 && (
           <div class="grid grid-cols-3 gap-2 mb-6">
-            {mediaList.slice(1, 7).map(m => (
+            {galleryList.map(m => (
               <div class="aspect-square rounded-lg overflow-hidden border border-border">
-                <img src={`/api/media/${encodeURIComponent(m.r2_key_thumb)}`} alt={m.alt}
+                <img src={mediaUrl(m.r2_key_thumb)} alt={m.alt}
                   class="w-full h-full object-cover" loading="lazy" />
               </div>
             ))}

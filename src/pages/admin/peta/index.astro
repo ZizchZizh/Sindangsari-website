@@ -28,7 +28,17 @@ const titikJson = JSON.stringify(titikList);
     <div>
       <h2 class="font-heading font-bold text-xl mb-4" style="color:var(--color-primary);">Peta Titik Lokasi</h2>
       <div id="admin-map" class="w-full rounded-xl border border-border overflow-hidden" style="height:400px;"></div>
-      <p class="text-xs text-text-muted mt-2">Klik peta untuk mengisi koordinat secara otomatis.</p>
+
+      <p class="text-sm text-text-muted mt-2">
+        <strong>Klik di peta</strong> untuk menaruh penanda — koordinat Lintang &amp; Bujur terisi
+        otomatis. Penanda bisa <strong>digeser</strong> untuk menyesuaikan. Anda juga boleh mengetik
+        koordinat sendiri; penandanya akan ikut berpindah.
+      </p>
+
+      <p id="koordinat-terpilih"
+        class="hidden text-sm font-heading font-semibold mt-2 px-3 py-2 rounded-lg"
+        style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;"
+        role="status" aria-live="polite"></p>
     </div>
 
     <!-- Add form -->
@@ -140,17 +150,65 @@ const titikJson = JSON.stringify(titikList);
     attribution: '© OpenStreetMap contributors'
   }).addTo(map);
 
+  const inputLat = document.getElementById('lat');
+  const inputLng = document.getElementById('lng');
+  const teksKoordinat = document.getElementById('koordinat-terpilih');
+
+  // Label berasal dari input admin dan Leaflet memperlakukan string di bindPopup
+  // sebagai HTML — jadi harus di-escape, kalau tidak jadi celah stored XSS.
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+
+  // ── Titik yang sudah tersimpan (hanya tampilan) ──
   const colors = { wisata: '#0D9488', umkm: '#15803D', potensi: '#B45309' };
   titiks.forEach(t => {
     const icon = L.circleMarker([t.lat, t.lng], {
       radius: 8, fillColor: colors[t.jenis] ?? '#666', color: '#fff',
       weight: 2, opacity: 1, fillOpacity: 0.9
     }).addTo(map);
-    if (t.label) icon.bindPopup(t.label);
+    if (t.label) icon.bindPopup(esc(t.label));
   });
 
-  map.on('click', (e) => {
-    document.getElementById('lat').value = e.latlng.lat.toFixed(6);
-    document.getElementById('lng').value = e.latlng.lng.toFixed(6);
-  });
+  // ── Penanda pilihan: muncul saat peta diklik, bisa digeser untuk menghaluskan ──
+  // Sebelumnya klik hanya mengisi kolom angka tanpa menampilkan apa pun di peta,
+  // sehingga operator tidak tahu fiturnya berjalan.
+  let penanda = null;
+
+  function pasangPenanda(latlng) {
+    if (!penanda) {
+      penanda = L.marker(latlng, { draggable: true, autoPan: true }).addTo(map);
+      penanda.bindTooltip('Geser untuk menyesuaikan', { permanent: false });
+      penanda.on('drag', () => tulisKoordinat(penanda.getLatLng()));
+    } else {
+      penanda.setLatLng(latlng);
+    }
+    tulisKoordinat(latlng);
+  }
+
+  function tulisKoordinat(latlng) {
+    const lat = latlng.lat.toFixed(6);
+    const lng = latlng.lng.toFixed(6);
+    inputLat.value = lat;
+    inputLng.value = lng;
+    if (teksKoordinat) {
+      teksKoordinat.textContent = `Titik terpilih: ${lat}, ${lng}`;
+      teksKoordinat.classList.remove('hidden');
+    }
+  }
+
+  map.on('click', (e) => pasangPenanda(e.latlng));
+
+  // Dua arah: mengetik koordinat manual juga memindahkan penanda, supaya admin
+  // bisa menempel koordinat dari Google Maps lalu memeriksanya secara visual.
+  function dariInput() {
+    const lat = parseFloat(inputLat.value);
+    const lng = parseFloat(inputLng.value);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+      pasangPenanda(L.latLng(lat, lng));
+      map.panTo([lat, lng]);
+    }
+  }
+  inputLat.addEventListener('change', dariInput);
+  inputLng.addEventListener('change', dariInput);
 </script>

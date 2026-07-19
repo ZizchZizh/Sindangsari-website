@@ -83,7 +83,7 @@ wrangler r2 bucket create web-desa-sindangsari-media
 wrangler kv namespace create SESSION_KV
 ```
 
-Situs diarahkan ke domain `sindangsari.web.id` (lihat `routes` di `wrangler.toml`). Backup mingguan otomatis (cron) saat ini **dinonaktifkan** — backup dilakukan manual lewat tombol ekspor di panel admin. Untuk mengaktifkan kembali, isi `crons = ["0 0 * * 0"]` di `wrangler.toml`.
+Situs diarahkan ke domain `sindangsarikasomalang.web.id` (lihat `routes` di `wrangler.toml`). Backup mingguan otomatis (cron) saat ini **dinonaktifkan** — backup dilakukan manual lewat tombol ekspor di panel admin. Untuk mengaktifkan kembali, isi `crons = ["0 0 * * 0"]` di `wrangler.toml`.
 
 ## Panel Admin
 

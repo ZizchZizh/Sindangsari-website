@@ -4,7 +4,7 @@
 
 Desa Sindangsari, Kecamatan Kasomalang, Kabupaten Subang, Jawa Barat
 
-🌐 **https://sindangsari.web.id**
+🌐 **https://sindangsarikasomalang.web.id**
 
 ---
 
@@ -57,7 +57,7 @@ Setiap fitur diuji dengan satu pertanyaan: *"Siapa yang mengelola ini setelah ti
 
 ### 3.1 Website Resmi Desa
 
-Website resmi Desa Sindangsari yang telah tayang (live) di domain **sindangsari.web.id** — responsif (mobile-first), cepat diakses pada sinyal lemah dan ponsel kelas bawah, serta ramah mesin pencari (server-side rendering).
+Website resmi Desa Sindangsari yang telah tayang (live) di domain **sindangsarikasomalang.web.id** — responsif (mobile-first), cepat diakses pada sinyal lemah dan ponsel kelas bawah, serta ramah mesin pencari (server-side rendering).
 
 ### 3.2 Fitur yang Diimplementasikan
 
@@ -92,7 +92,7 @@ Seluruh infrastruktur berjalan pada tier gratis Cloudflare; satu-satunya biaya r
 
 ### 3.4 Dokumentasi dan Hasil Deployment
 
-- **Website live** di https://sindangsari.web.id di atas infrastruktur Cloudflare.
+- **Website live** di https://sindangsarikasomalang.web.id di atas infrastruktur Cloudflare.
 - **Dokumentasi teknis (README)** — panduan menjalankan, mengonfigurasi, dan men-deploy ulang situs.
 - **Panel admin siap serah terima** — perangkat desa dapat mengelola seluruh konten dinamis (berita, UMKM, wisata, peta, media, konten halaman) tanpa menyentuh kode.
 - **Fitur ekspor/backup data** — cadangan data dapat diunduh langsung dari panel admin.

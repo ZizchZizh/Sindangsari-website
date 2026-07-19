@@ -14,7 +14,7 @@ if (!berita) return Astro.redirect('/404');
 const coverSrc = berita.cover_key ? mediaUrl(berita.cover_key) : null;
 const coverAlt = berita.cover_alt || berita.judul;
 
-const canonicalUrl = new URL(`/berita/${slug}`, Astro.site ?? 'https://sindangsari.web.id').href;
+const canonicalUrl = new URL(`/berita/${slug}`, Astro.site ?? 'https://sindangsarikasomalang.web.id').href;
 ---
 
 <Layout

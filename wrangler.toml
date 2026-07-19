@@ -2,13 +2,13 @@ name = "web-desa-sindangsari"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = false
-routes = [{ pattern = "sindangsari.web.id/*", zone_name = "sindangsari.web.id" }]
+routes = [{ pattern = "sindangsarikasomalang.web.id/*", zone_name = "sindangsarikasomalang.web.id" }]
 
 # ─── Cloudflare D1 (konten SQLite) ───────────────────────────────────────────
 [[d1_databases]]
 binding = "DB"
 database_name = "web-desa-sindangsari-db"
-database_id = "c578c1ca-4e96-4142-b0f0-4ceffe035ed9"
+database_id = "cc5de6c2-8fb3-465c-b70d-f7de39b00d79"
 
 # ─── Cloudflare R2 (media binary) ────────────────────────────────────────────
 [[r2_buckets]]
@@ -18,7 +18,7 @@ bucket_name = "web-desa-sindangsari-media"
 # ─── Cloudflare KV (sesi TTL) ────────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "SESSION_KV"
-id = "12efcdd486e54c86a30f5db20351a1ab"
+id = "af202dcfca434b9396ce19b632eeafdf"
 
 # ─── Cron triggers (dinonaktifkan) ───────────────────────────────────────────
 # Backup mingguan otomatis dimatikan. Backup dilakukan manual lewat tombol

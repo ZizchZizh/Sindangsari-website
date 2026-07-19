@@ -1,7 +1,7 @@
 # Website Resmi Desa Sindangsari — Materi PPT Lokakarya
 
 **KKN-T Inovasi IPB University 2026** · Desa Sindangsari, Kec. Kasomalang, Kab. Subang
-🌐 **sindangsari.web.id**
+🌐 **sindangsarikasomalang.web.id**
 
 ---
 
@@ -36,7 +36,7 @@
 
 ## Slide 4 — Luaran: Website Resmi Desa
 
-Tayang di **sindangsari.web.id** — cepat, mobile-friendly, terindeks Google.
+Tayang di **sindangsarikasomalang.web.id** — cepat, mobile-friendly, terindeks Google.
 
 **Fitur utama:**
 

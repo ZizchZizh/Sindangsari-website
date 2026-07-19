@@ -1,6 +1,7 @@
 ---
 import Layout from '../../components/Layout.astro';
-import { getPublishedLayanan, LAYANAN_KATEGORI } from '../../lib/db/layanan';
+import { getPublishedLayanan, LAYANAN_KATEGORI, kategoriIcon, isGratis } from '../../lib/db/layanan';
+import { mediaUrl } from '../../lib/db/media';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
@@ -33,7 +34,8 @@ const totalCount = layananList.length;
         </button>
         {usedKategori.map((k) => (
           <button data-cat={k}
-            class="chip-filter px-3.5 py-2 min-h-[40px] rounded-full text-sm font-heading font-semibold border-2 border-line text-ink hover:border-accent transition-colors">
+            class="chip-filter inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] rounded-full text-sm font-heading font-semibold border-2 border-line text-ink hover:border-accent transition-colors">
+            <i data-lucide={kategoriIcon(k)} class="w-4 h-4" aria-hidden="true"></i>
             {k}
           </button>
         ))}
@@ -54,19 +56,34 @@ const totalCount = layananList.length;
     </nav>
     <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-2">Layanan Administrasi Desa</h1>
     <p class="text-muted text-lg mt-2 max-w-2xl">
-      Persyaratan, alur pelayanan, biaya, dan estimasi waktu untuk setiap surat yang diterbitkan Kantor Desa Sindangsari.
-      Siapkan berkas dari rumah agar urusan Anda selesai dalam sekali datang.
+      Pilih surat yang Anda butuhkan untuk melihat syarat dan alurnya.
     </p>
   </div>
 
-  <!-- Jam pelayanan -->
-  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 pt-4">
-    <div class="rounded-xl border border-line bg-sand/50 p-4 flex flex-wrap items-center gap-x-6 gap-y-2">
-      <p class="flex items-center gap-2 text-sm text-ink font-heading font-semibold">
-        <i data-lucide="clock" class="w-4 h-4 text-primary"></i> Jam Pelayanan
-      </p>
-      <p class="text-sm text-muted">Senin–Jumat, 08.00–15.00 WIB</p>
-      <p class="text-sm text-muted">Istirahat 12.00–13.00 WIB · Sabtu, Minggu &amp; hari libur nasional tutup</p>
+  <!-- Jam pelayanan & biaya: dua hal yang membuat warga bolak-balik kalau tidak tahu di depan. -->
+  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 pt-5">
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div class="rounded-xl border border-line bg-sand/50 p-4 flex items-start gap-3">
+        <span class="w-10 h-10 shrink-0 rounded-lg bg-white grid place-items-center" aria-hidden="true">
+          <i data-lucide="clock" class="w-5 h-5 text-primary"></i>
+        </span>
+        <div>
+          <p class="text-sm font-heading font-bold text-ink">Jam Pelayanan</p>
+          <p class="text-sm text-muted mt-0.5">Senin–Jumat, 08.00–15.00 WIB</p>
+          <p class="text-sm text-muted">Istirahat 12.00–13.00 · Sabtu &amp; Minggu tutup</p>
+        </div>
+      </div>
+      <div class="rounded-xl border border-line bg-accent/5 p-4 flex items-start gap-3">
+        <span class="w-10 h-10 shrink-0 rounded-lg bg-white grid place-items-center" aria-hidden="true">
+          <i data-lucide="shield-check" class="w-5 h-5 text-accent"></i>
+        </span>
+        <div>
+          <p class="text-sm font-heading font-bold text-ink">Pelayanan Gratis</p>
+          <p class="text-sm text-muted mt-0.5">
+            Semua layanan tidak dipungut biaya, kecuali disebutkan lain pada layanan tersebut.
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -87,47 +104,59 @@ const totalCount = layananList.length;
         <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {layananList.map((l) => (
             <article
-              class="layanan-card group bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(16,35,26,.08)] hover:shadow-[0_12px_24px_rgba(16,35,26,.12)] hover:border-accent transition-all flex flex-col"
+              class="layanan-card group relative bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(16,35,26,.08)] hover:shadow-[0_12px_24px_rgba(16,35,26,.12)] hover:border-accent transition-all flex flex-col"
               data-name={l.nama.toLowerCase()}
               data-cat={l.kategori}
             >
-              <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full w-max bg-sand text-primary">
-                {l.kategori}
-              </span>
-
-              <h2 class="font-heading font-bold text-lg text-ink mt-3">
-                <a href={`/layanan/${l.slug}`} class="hover:text-primary focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent rounded">
-                  {l.nama}
-                </a>
-              </h2>
-
-              {l.ringkasan && (
-                <p class="text-sm text-muted mt-1.5 line-clamp-3 flex-1">{l.ringkasan}</p>
+              {l.cover_thumb_key && (
+                <div class="-mx-5 -mt-5 mb-4 rounded-t-xl overflow-hidden bg-sand">
+                  <img src={mediaUrl(l.cover_thumb_key)} alt={l.cover_alt || `Poster ${l.nama}`}
+                    class="w-full h-36 object-cover" loading="lazy" />
+                </div>
               )}
 
-              <dl class="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted">
-                <div class="flex items-center gap-1.5">
-                  <i data-lucide="wallet" class="w-3.5 h-3.5 text-primary"></i>
-                  <dt class="sr-only">Biaya</dt>
-                  <dd class="font-medium text-ink">{l.biaya}</dd>
+              <div class="flex items-start gap-3">
+                <span class="w-11 h-11 shrink-0 rounded-xl bg-sand grid place-items-center" aria-hidden="true">
+                  <i data-lucide={kategoriIcon(l.kategori)} class="w-5 h-5 text-primary"></i>
+                </span>
+                <div class="min-w-0">
+                  <span class="text-xs font-heading font-semibold text-muted">{l.kategori}</span>
+                  <h2 class="font-heading font-bold text-lg text-ink leading-snug">
+                    <a href={`/layanan/${l.slug}`} class="hover:text-primary focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent rounded">
+                      <span class="absolute inset-0"></span>
+                      {l.nama}
+                    </a>
+                  </h2>
                 </div>
-                <div class="flex items-center gap-1.5">
-                  <i data-lucide="clock" class="w-3.5 h-3.5 text-primary"></i>
+              </div>
+
+              {l.ringkasan && (
+                <p class="text-sm text-muted mt-3 line-clamp-2 flex-1">{l.ringkasan}</p>
+              )}
+
+              <!-- Tiga hal yang paling ditanyakan warga: bayar berapa, jadi berapa lama, bawa apa. -->
+              <dl class="mt-4 flex flex-wrap gap-2">
+                <div class={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[13px] font-heading font-semibold ${isGratis(l.biaya) ? 'bg-accent/10 text-accent' : 'bg-sand text-primary'}`}>
+                  <i data-lucide="wallet" class="w-3.5 h-3.5" aria-hidden="true"></i>
+                  <dt class="sr-only">Biaya</dt>
+                  <dd>{l.biaya}</dd>
+                </div>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[13px] bg-sand text-primary font-heading font-semibold">
+                  <i data-lucide="clock" class="w-3.5 h-3.5" aria-hidden="true"></i>
                   <dt class="sr-only">Estimasi waktu</dt>
                   <dd>{l.estimasi_waktu}</dd>
                 </div>
-                <div class="flex items-center gap-1.5">
-                  <i data-lucide="list-checks" class="w-3.5 h-3.5 text-primary"></i>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[13px] bg-sand text-primary font-heading font-semibold">
+                  <i data-lucide="list-checks" class="w-3.5 h-3.5" aria-hidden="true"></i>
                   <dt class="sr-only">Jumlah persyaratan</dt>
-                  <dd>{l.persyaratan.length} syarat</dd>
+                  <dd>{l.persyaratan.length} berkas</dd>
                 </div>
               </dl>
 
-              <a href={`/layanan/${l.slug}`}
-                class="mt-4 inline-flex items-center justify-center gap-2 w-full border-2 border-primary text-primary hover:bg-primary hover:text-white text-sm font-heading font-semibold py-2.5 rounded-lg transition-colors min-h-[44px]">
-                Lihat Syarat &amp; Alur
+              <span class="mt-4 inline-flex items-center gap-2 text-sm font-heading font-semibold text-primary group-hover:gap-3 transition-all">
+                Lihat syarat &amp; alur
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
-              </a>
+              </span>
             </article>
           ))}
         </div>

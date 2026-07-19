@@ -1,4 +1,5 @@
 import { toSlug } from './wisata';
+import type { WithCover } from './media';
 
 // ── Domain ───────────────────────────────────────────────────────────────────
 
@@ -13,13 +14,36 @@ export const LAYANAN_KATEGORI = [
 
 export type LayananKategori = (typeof LAYANAN_KATEGORI)[number];
 
+/**
+ * Ikon Lucide per kategori, dipakai kartu dan halaman detail publik supaya
+ * warga mengenali jenis layanan dari bentuknya tanpa harus membaca dulu.
+ */
+const KATEGORI_ICON: Record<LayananKategori, string> = {
+  Kependudukan: 'users',
+  'Surat Keterangan': 'file-text',
+  Pertanahan: 'map',
+  'Usaha & Ekonomi': 'store',
+  'Sosial & Bantuan': 'heart-handshake',
+  Lainnya: 'folder',
+};
+
+/** `kategori` tersimpan sebagai TEXT bebas, jadi baris lama bisa saja di luar allowlist. */
+export function kategoriIcon(kategori: string): string {
+  return KATEGORI_ICON[kategori as LayananKategori] ?? 'file-text';
+}
+
+/** Layanan gratis adalah kabar baik — halaman publik menonjolkannya, bukan menyembunyikannya di teks kecil. */
+export function isGratis(biaya: string): boolean {
+  return /^\s*(gratis|rp\.?\s*0|0)\s*$/i.test(biaya);
+}
+
 /** One step in the procedure a resident follows to obtain the service. */
 export interface AlurLangkah {
   judul: string;
   keterangan: string;
 }
 
-export interface Layanan {
+export interface Layanan extends WithCover {
   id: number;
   slug: string;
   nama: string;
@@ -33,14 +57,22 @@ export interface Layanan {
   penanggung_jawab: string | null;
   wa_number: string | null;
   form_url: string | null;
+  cover_media_id: number | null;
   urutan: number;
   status: 'draft' | 'published';
   created_at: string;
   updated_at: string;
 }
 
-/** Everything the caller supplies on create/update — slug and timestamps are derived. */
-export type LayananInput = Omit<Layanan, 'id' | 'slug' | 'created_at' | 'updated_at'>;
+/**
+ * Everything the caller supplies on create/update — slug and timestamps are
+ * derived, and cover_key/thumb/alt are read-only fields that come from the
+ * media JOIN (only cover_media_id is settable).
+ */
+export type LayananInput = Omit<
+  Layanan,
+  'id' | 'slug' | 'created_at' | 'updated_at' | 'cover_key' | 'cover_thumb_key' | 'cover_alt'
+>;
 
 /** Row shape as it actually lives in D1: the two list columns are TEXT holding JSON. */
 interface LayananRow extends Omit<Layanan, 'persyaratan' | 'alur'> {
@@ -150,28 +182,32 @@ export function layananCachePaths(slug?: string | null): string[] {
 
 // ── Queries ──────────────────────────────────────────────────────────────────
 
+// Poster/pamflet di-JOIN dalam query yang sama agar daftar tidak N+1.
+const SEL = `SELECT l.*, m.r2_key_display AS cover_key, m.r2_key_thumb AS cover_thumb_key, m.alt AS cover_alt
+             FROM layanan l LEFT JOIN media m ON m.id = l.cover_media_id`;
+
 export async function getPublishedLayanan(db: D1Database): Promise<Layanan[]> {
   const r = await db
-    .prepare("SELECT * FROM layanan WHERE status='published' ORDER BY urutan, nama")
+    .prepare(`${SEL} WHERE l.status='published' ORDER BY l.urutan, l.nama`)
     .all<LayananRow>();
   return r.results.map(hydrate);
 }
 
 export async function getLayananBySlug(slug: string, db: D1Database): Promise<Layanan | null> {
   const row = await db
-    .prepare("SELECT * FROM layanan WHERE slug=? AND status='published'")
+    .prepare(`${SEL} WHERE l.slug=? AND l.status='published'`)
     .bind(slug)
     .first<LayananRow>();
   return row ? hydrate(row) : null;
 }
 
 export async function getAllLayanan(db: D1Database): Promise<Layanan[]> {
-  const r = await db.prepare('SELECT * FROM layanan ORDER BY urutan, nama').all<LayananRow>();
+  const r = await db.prepare(`${SEL} ORDER BY l.urutan, l.nama`).all<LayananRow>();
   return r.results.map(hydrate);
 }
 
 export async function getLayananById(id: number, db: D1Database): Promise<Layanan | null> {
-  const row = await db.prepare('SELECT * FROM layanan WHERE id=?').bind(id).first<LayananRow>();
+  const row = await db.prepare(`${SEL} WHERE l.id=?`).bind(id).first<LayananRow>();
   return row ? hydrate(row) : null;
 }
 
@@ -189,8 +225,8 @@ export async function createLayanan(
     .prepare(
       `INSERT INTO layanan
          (slug,nama,kategori,ringkasan,persyaratan_json,alur_json,biaya,estimasi_waktu,
-          dasar_hukum,penanggung_jawab,wa_number,form_url,urutan,status)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id`
+          dasar_hukum,penanggung_jawab,wa_number,form_url,cover_media_id,urutan,status)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id`
     )
     .bind(
       slug,
@@ -205,6 +241,7 @@ export async function createLayanan(
       data.penanggung_jawab,
       data.wa_number,
       data.form_url,
+      data.cover_media_id,
       data.urutan,
       data.status
     )
@@ -217,7 +254,7 @@ export async function updateLayanan(id: number, data: LayananInput, db: D1Databa
     .prepare(
       `UPDATE layanan SET
          nama=?,kategori=?,ringkasan=?,persyaratan_json=?,alur_json=?,biaya=?,estimasi_waktu=?,
-         dasar_hukum=?,penanggung_jawab=?,wa_number=?,form_url=?,urutan=?,status=?,
+         dasar_hukum=?,penanggung_jawab=?,wa_number=?,form_url=?,cover_media_id=?,urutan=?,status=?,
          updated_at=datetime('now')
        WHERE id=?`
     )
@@ -233,6 +270,7 @@ export async function updateLayanan(id: number, data: LayananInput, db: D1Databa
       data.penanggung_jawab,
       data.wa_number,
       data.form_url,
+      data.cover_media_id,
       data.urutan,
       data.status,
       id

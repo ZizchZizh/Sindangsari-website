@@ -4,6 +4,7 @@ import {
   LAYANAN_KATEGORI,
   type LayananInput,
 } from '../db/layanan';
+import { parseCoverId } from './cover';
 
 export interface ParseResult {
   ok: boolean;
@@ -64,6 +65,7 @@ export function parseLayananForm(fd: FormData): ParseResult {
       penanggung_jawab: nullable(fd, 'penanggung_jawab'),
       wa_number,
       form_url: nullable(fd, 'form_url'),
+      cover_media_id: parseCoverId(fd),
       urutan,
       status,
     },

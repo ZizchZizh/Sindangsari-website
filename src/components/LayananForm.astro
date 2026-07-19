@@ -6,6 +6,8 @@ import {
   formatAlurText,
   type Layanan,
 } from '../lib/db/layanan';
+import { coverUrl } from '../lib/db/media';
+import MediaInput from './MediaInput.astro';
 
 interface Props {
   /** Omit for the "create" form; pass the record to edit it. */
@@ -37,6 +39,8 @@ const v = {
   urutan: String(layanan?.urutan ?? 0),
   status: layanan?.status ?? 'draft',
 };
+
+const posterUrl = layanan ? coverUrl(layanan) : null;
 
 const inputClass = 'w-full rounded-lg border px-4 py-3 text-base focus:outline-none';
 const inputStyle = 'border-color:var(--color-border); min-height:44px;';
@@ -80,6 +84,17 @@ const alurPlaceholder = [
       placeholder="Penjelasan singkat: surat ini untuk apa dan biasanya dipakai untuk keperluan apa.">{v.ringkasan}</textarea>
     <p class="text-xs text-text-muted mt-1">Tampil di kartu daftar layanan dan di bagian atas halaman detail.</p>
   </div>
+
+  <!-- ── Poster / pamflet ── -->
+  <fieldset class="border border-border rounded-xl p-4">
+    <legend class="font-heading font-semibold text-sm px-2" style="color:var(--color-primary);">Poster / Pamflet</legend>
+    <MediaInput
+      mediaId={layanan?.cover_media_id ?? null}
+      previewUrl={posterUrl}
+      label="Poster / Pamflet Layanan"
+      hint="Opsional. Unggah poster/pamflet layanan (mis. alur atau persyaratan bergambar). Tampil di halaman detail layanan. Gambar otomatis dikecilkan sebelum diunggah."
+    />
+  </fieldset>
 
   <!-- ── Persyaratan ── -->
   <fieldset class="border border-border rounded-xl p-4">

@@ -1,6 +1,7 @@
 ---
 import Layout from '../../components/Layout.astro';
-import { getLayananBySlug, getPublishedLayanan, waRequestLink } from '../../lib/db/layanan';
+import { getLayananBySlug, getPublishedLayanan, waRequestLink, kategoriIcon, isGratis } from '../../lib/db/layanan';
+import { coverUrl } from '../../lib/db/media';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
@@ -10,6 +11,7 @@ const layanan = env && slug ? await getLayananBySlug(slug, env.DB) : null;
 if (!layanan) return Astro.redirect('/404');
 
 const waLink = waRequestLink(layanan);
+const posterUrl = coverUrl(layanan);
 
 // "Layanan lainnya" — same category first, then anything else, max 3.
 const semua = await getPublishedLayanan(env!.DB);
@@ -35,12 +37,17 @@ const howToSchema = {
   })),
 };
 
+// Biaya & waktu naik ke strip ringkas di atas; sidebar menyisakan keterangan formal.
 const ketentuan = [
-  { icon: 'wallet', label: 'Biaya', value: layanan.biaya },
-  { icon: 'clock', label: 'Estimasi Waktu', value: layanan.estimasi_waktu },
   { icon: 'user-check', label: 'Penanggung Jawab', value: layanan.penanggung_jawab },
   { icon: 'scale', label: 'Dasar Hukum', value: layanan.dasar_hukum },
 ].filter((k) => k.value);
+
+const ringkas = [
+  { icon: 'wallet', label: 'Biaya', value: layanan.biaya, hi: isGratis(layanan.biaya) },
+  { icon: 'clock', label: 'Lama proses', value: layanan.estimasi_waktu, hi: false },
+  { icon: 'list-checks', label: 'Berkas dibawa', value: `${layanan.persyaratan.length} berkas`, hi: false },
+];
 ---
 
 <Layout
@@ -63,15 +70,32 @@ const ketentuan = [
         <span class="text-ink font-medium">{layanan.nama}</span>
       </nav>
 
-      <span class="inline-flex mt-4 text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-white text-primary border border-line">
-        {layanan.kategori}
-      </span>
-
-      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-3">{layanan.nama}</h1>
+      <div class="flex items-start gap-4 mt-4">
+        <span class="w-14 h-14 shrink-0 rounded-2xl bg-white border border-line grid place-items-center" aria-hidden="true">
+          <i data-lucide={kategoriIcon(layanan.kategori)} class="w-7 h-7 text-primary"></i>
+        </span>
+        <div class="min-w-0">
+          <span class="text-sm font-heading font-semibold text-muted">{layanan.kategori}</span>
+          <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary leading-tight">{layanan.nama}</h1>
+        </div>
+      </div>
 
       {layanan.ringkasan && (
-        <p class="text-muted text-lg mt-3 max-w-3xl">{layanan.ringkasan}</p>
+        <p class="text-muted text-lg mt-4 max-w-3xl">{layanan.ringkasan}</p>
       )}
+
+      <!-- Jawaban langsung atas tiga pertanyaan pertama warga, sebelum harus membaca apa pun. -->
+      <dl class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl">
+        {ringkas.map(({ icon, label, value, hi }) => (
+          <div class={`rounded-xl border p-4 flex items-center gap-3 ${hi ? 'border-accent/30 bg-accent/5' : 'border-line bg-white'}`}>
+            <i data-lucide={icon} class={`w-5 h-5 shrink-0 ${hi ? 'text-accent' : 'text-primary'}`} aria-hidden="true"></i>
+            <div class="min-w-0">
+              <dt class="text-xs text-muted">{label}</dt>
+              <dd class={`font-heading font-bold mt-0.5 ${hi ? 'text-accent' : 'text-ink'}`}>{value}</dd>
+            </div>
+          </div>
+        ))}
+      </dl>
     </div>
   </div>
 
@@ -85,9 +109,9 @@ const ketentuan = [
         <section aria-labelledby="h-syarat">
           <h2 id="h-syarat" class="font-heading font-bold text-xl text-primary flex items-center gap-2">
             <i data-lucide="list-checks" class="w-5 h-5"></i>
-            Persyaratan
+            Berkas yang Dibawa
           </h2>
-          <p class="text-sm text-muted mt-1">Siapkan seluruh berkas berikut sebelum datang ke Kantor Desa.</p>
+          <p class="text-sm text-muted mt-1">Siapkan dari rumah agar selesai dalam sekali datang.</p>
 
           <ul class="mt-4 space-y-2.5">
             {layanan.persyaratan.map((syarat) => (
@@ -143,34 +167,33 @@ const ketentuan = [
           </ol>
         </section>
 
+        <!-- Poster / pamflet — pendamping visual, bukan sumber utama, jadi ditaruh setelah alur. -->
+        {posterUrl && (
+          <section aria-labelledby="h-poster">
+            <h2 id="h-poster" class="font-heading font-bold text-xl text-primary flex items-center gap-2">
+              <i data-lucide="image" class="w-5 h-5"></i>
+              Poster / Pamflet
+            </h2>
+            <a href={posterUrl} target="_blank" rel="noopener noreferrer"
+              class="mt-4 block rounded-xl overflow-hidden border border-line bg-white shadow-[0_2px_6px_rgba(16,35,26,.05)] hover:shadow-[0_12px_24px_rgba(16,35,26,.12)] transition-shadow">
+              <img src={posterUrl} alt={layanan.cover_alt || `Poster layanan ${layanan.nama}`}
+                class="w-full h-auto" loading="lazy" />
+            </a>
+            <p class="text-xs text-muted mt-2">Ketuk gambar untuk memperbesar.</p>
+          </section>
+        )}
+
       </div>
 
       <!-- ── Sidebar: ketentuan + pengajuan ── -->
       <aside class="lg:col-span-1">
         <div class="lg:sticky lg:top-24 space-y-5">
 
-          <!-- Ketentuan -->
-          <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(16,35,26,.08)]">
-            <h2 class="font-heading font-bold text-ink">Ketentuan Pelayanan</h2>
-            <dl class="mt-4 space-y-4">
-              {ketentuan.map(({ icon, label, value }) => (
-                <div class="flex items-start gap-3">
-                  <i data-lucide={icon} class="w-4 h-4 text-primary shrink-0 mt-1"></i>
-                  <div>
-                    <dt class="text-xs text-muted">{label}</dt>
-                    <dd class="text-sm font-medium text-ink mt-0.5">{value}</dd>
-                  </div>
-                </div>
-              ))}
-            </dl>
-          </div>
-
           <!-- Pengajuan -->
           <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(16,35,26,.08)]">
             <h2 class="font-heading font-bold text-ink">Ajukan Layanan</h2>
             <p class="text-sm text-muted mt-1">
-              Tanyakan kesiapan berkas Anda lebih dulu lewat WhatsApp, atau datang langsung ke Kantor Desa
-              pada jam pelayanan.
+              Tanyakan kesiapan berkas lewat WhatsApp, atau datang langsung ke Kantor Desa.
             </p>
 
             {waLink ? (
@@ -187,22 +210,38 @@ const ketentuan = [
               </a>
             )}
 
-            <div class="mt-4 pt-4 border-t border-line">
-              <p class="text-xs text-muted flex items-start gap-2">
-                <i data-lucide="clock" class="w-3.5 h-3.5 text-primary shrink-0 mt-0.5"></i>
-                <span>
-                  <strong class="text-ink font-heading">Jam pelayanan:</strong><br />
-                  Senin–Jumat, 08.00–15.00 WIB<br />
-                  Istirahat 12.00–13.00 WIB
-                </span>
-              </p>
-            </div>
-
-            <p class="text-xs text-muted mt-4 pt-4 border-t border-line flex items-start gap-2">
-              <i data-lucide="info" class="w-3.5 h-3.5 text-primary shrink-0 mt-0.5"></i>
-              <span>Seluruh layanan administrasi di Kantor Desa <strong class="text-ink">tidak dipungut biaya</strong>, kecuali disebutkan lain. Laporkan bila ada pungutan di luar ketentuan.</span>
-            </p>
+            <dl class="mt-4 pt-4 border-t border-line flex items-start gap-2.5">
+              <i data-lucide="clock" class="w-4 h-4 text-primary shrink-0 mt-0.5" aria-hidden="true"></i>
+              <div>
+                <dt class="text-xs font-heading font-semibold text-ink">Jam pelayanan</dt>
+                <dd class="text-xs text-muted mt-0.5">Senin–Jumat, 08.00–15.00 WIB</dd>
+                <dd class="text-xs text-muted">Istirahat 12.00–13.00 WIB</dd>
+              </div>
+            </dl>
           </div>
+
+          <!-- Ketentuan formal: paling jarang dibutuhkan warga, jadi paling bawah. -->
+          {ketentuan.length > 0 && (
+            <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(16,35,26,.08)]">
+              <h2 class="font-heading font-bold text-ink">Ketentuan Pelayanan</h2>
+              <dl class="mt-4 space-y-4">
+                {ketentuan.map(({ icon, label, value }) => (
+                  <div class="flex items-start gap-3">
+                    <i data-lucide={icon} class="w-4 h-4 text-primary shrink-0 mt-1" aria-hidden="true"></i>
+                    <div>
+                      <dt class="text-xs text-muted">{label}</dt>
+                      <dd class="text-sm font-medium text-ink mt-0.5">{value}</dd>
+                    </div>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          )}
+
+          <p class="text-xs text-muted flex items-start gap-2 px-1">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" aria-hidden="true"></i>
+            <span>Laporkan bila ada pungutan di luar ketentuan di atas.</span>
+          </p>
 
         </div>
       </aside>
@@ -216,12 +255,15 @@ const ketentuan = [
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
           {lainnya.map((l) => (
             <a href={`/layanan/${l.slug}`}
-              class="group bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(16,35,26,.08)] hover:shadow-[0_12px_24px_rgba(16,35,26,.12)] hover:border-accent transition-all block">
-              <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-sand text-primary">
-                {l.kategori}
+              class="group bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(16,35,26,.08)] hover:shadow-[0_12px_24px_rgba(16,35,26,.12)] hover:border-accent transition-all flex items-start gap-3">
+              <span class="w-10 h-10 shrink-0 rounded-xl bg-sand grid place-items-center" aria-hidden="true">
+                <i data-lucide={kategoriIcon(l.kategori)} class="w-5 h-5 text-primary"></i>
               </span>
-              <h3 class="font-heading font-semibold text-ink mt-3 group-hover:text-primary">{l.nama}</h3>
-              <p class="text-xs text-muted mt-1.5">{l.persyaratan.length} syarat · {l.estimasi_waktu}</p>
+              <div class="min-w-0">
+                <span class="text-xs font-heading font-semibold text-muted">{l.kategori}</span>
+                <h3 class="font-heading font-semibold text-ink group-hover:text-primary leading-snug">{l.nama}</h3>
+                <p class="text-xs text-muted mt-1.5">{l.persyaratan.length} berkas · {l.estimasi_waktu}</p>
+              </div>
             </a>
           ))}
         </div>

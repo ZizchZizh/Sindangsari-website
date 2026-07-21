@@ -1,0 +1,174 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import MediaInput from '../../../components/MediaInput.astro';
+import { getTitikById, JENIS_TITIK, JENIS_TITIK_KEYS } from '../../../lib/db/titik-peta';
+import { coverUrl } from '../../../lib/db/media';
+import batasDesa from '../../../data/batas-desa-sindangsari.json';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const id = Number(Astro.params.id);
+const titik = env && id ? await getTitikById(id, env.DB) : null;
+
+if (!titik) return Astro.redirect('/admin/peta');
+
+const saved = Astro.url.searchParams.get('saved');
+const error = Astro.url.searchParams.get('error');
+
+const jenisPakaiSlug = JENIS_TITIK_KEYS.filter(k => JENIS_TITIK[k].link !== '');
+const slugJson = JSON.stringify(jenisPakaiSlug);
+const batasJson = JSON.stringify(batasDesa);
+const previewUrl = coverUrl(titik);
+const judul = titik.label || `Titik #${titik.id}`;
+---
+
+<AdminLayout title={`Sunting ${judul}`} breadcrumb="Peta / Sunting">
+
+  {saved && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">
+      Titik peta berhasil disimpan.
+    </div>
+  )}
+  {error && (
+    <div role="alert" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#FEE2E2; color:#991B1B; border:1px solid #FECACA;">
+      Gagal menyimpan. Pastikan jenis dipilih dan koordinat terisi.
+    </div>
+  )}
+
+  <div class="flex items-start justify-between gap-4 mb-4">
+    <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">Sunting Titik Peta</h2>
+    <a href="/peta" target="_blank" rel="noopener"
+      class="text-sm font-heading font-medium text-accent hover:underline shrink-0 mt-1">
+      Lihat di peta ↗
+    </a>
+  </div>
+
+  <form method="POST" action={`/api/admin/peta/${titik.id}`}>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+
+      <!-- Map picker -->
+      <div>
+        <div id="admin-map" class="w-full rounded-xl border border-border overflow-hidden" style="height:360px;"></div>
+        <p class="text-sm text-text-muted mt-2">
+          <strong>Klik</strong> atau <strong>geser</strong> penanda untuk memindahkan lokasi. Koordinat ikut terisi otomatis.
+        </p>
+        <p id="koordinat-terpilih" class="text-sm font-heading font-semibold mt-2 px-3 py-2 rounded-lg"
+          style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;" role="status" aria-live="polite">
+          Titik saat ini: {titik.lat.toFixed(6)}, {titik.lng.toFixed(6)}
+        </p>
+      </div>
+
+      <!-- Fields -->
+      <div class="space-y-4">
+        <div>
+          <label for="label" class="block font-heading font-medium text-sm mb-1.5">Label</label>
+          <input type="text" id="label" name="label" value={titik.label ?? ''}
+            class="w-full rounded-lg border px-4 py-2.5 text-base focus:outline-none"
+            style="border-color:var(--color-border); min-height:44px;" placeholder="cth. Masjid Al Baroqah" />
+        </div>
+
+        <div>
+          <label for="jenis" class="block font-heading font-medium text-sm mb-1.5">Jenis <span>*</span></label>
+          <select id="jenis" name="jenis" required
+            class="w-full rounded-lg border px-4 py-2.5 text-base focus:outline-none"
+            style="border-color:var(--color-border); min-height:44px;">
+            {JENIS_TITIK_KEYS.map(k => <option value={k} selected={k === titik.jenis}>{JENIS_TITIK[k].label}</option>)}
+          </select>
+        </div>
+
+        <div id="slug-field">
+          <label for="linked_slug" class="block font-heading font-medium text-sm mb-1.5">Slug Entitas</label>
+          <input type="text" id="linked_slug" name="linked_slug" value={titik.linked_slug}
+            class="w-full rounded-lg border px-4 py-2.5 text-base focus:outline-none"
+            style="border-color:var(--color-border); min-height:44px;" placeholder="cth. curug-masigit" />
+          <p class="text-xs text-text-muted mt-1">Hanya untuk Wisata/UMKM/Potensi. Fasilitas umum tidak perlu slug.</p>
+        </div>
+
+        <div>
+          <label for="deskripsi" class="block font-heading font-medium text-sm mb-1.5">Deskripsi Singkat</label>
+          <textarea id="deskripsi" name="deskripsi" rows="3"
+            class="w-full rounded-lg border px-4 py-2.5 text-base focus:outline-none"
+            style="border-color:var(--color-border);"
+            placeholder="cth. Masjid jami di RW 03, kapasitas ±300 jamaah.">{titik.deskripsi ?? ''}</textarea>
+          <p class="text-xs text-text-muted mt-1">Tampil di panel saat pin diklik di peta.</p>
+        </div>
+
+        <MediaInput label="Foto" mediaId={titik.cover_media_id} previewUrl={previewUrl}
+          hint="Tampil di panel detail pin. Otomatis dikecilkan sebelum diunggah." />
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="lat" class="block font-heading font-medium text-sm mb-1.5">Lintang <span>*</span></label>
+            <input type="number" id="lat" name="lat" step="any" required value={titik.lat}
+              class="w-full rounded-lg border px-4 py-2.5 text-base focus:outline-none"
+              style="border-color:var(--color-border); min-height:44px;" />
+          </div>
+          <div>
+            <label for="lng" class="block font-heading font-medium text-sm mb-1.5">Bujur <span>*</span></label>
+            <input type="number" id="lng" name="lng" step="any" required value={titik.lng}
+              class="w-full rounded-lg border px-4 py-2.5 text-base focus:outline-none"
+              style="border-color:var(--color-border); min-height:44px;" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sticky bottom-0 bg-white border-t border-border mt-6 -mx-4 md:-mx-6 px-4 md:px-6 py-3 flex justify-end gap-3" style="box-shadow:0 -2px 8px rgba(0,0,0,.06);">
+      <a href="/admin/peta"
+        class="px-4 py-2 rounded-lg font-heading font-medium text-sm border hover:bg-sand"
+        style="border-color:var(--color-border); min-height:44px; display:flex; align-items:center;">
+        Batal
+      </a>
+      <button type="submit"
+        class="px-5 py-2 rounded-lg font-heading font-semibold text-white text-sm cursor-pointer"
+        style="background:var(--color-cta); min-height:44px;">
+        Simpan Perubahan
+      </button>
+    </div>
+  </form>
+
+</AdminLayout>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script define:vars={{ initLat: titik.lat, initLng: titik.lng, slugJson, batasJson }}>
+  const JENIS_SLUG = JSON.parse(slugJson);
+  const map = L.map('admin-map').setView([initLat, initLng], 15);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
+
+  L.geoJSON(JSON.parse(batasJson), {
+    style: { color: '#166534', weight: 2.5, opacity: 0.9, fillColor: '#166534', fillOpacity: 0.05 },
+    interactive: false,
+  }).addTo(map);
+
+  const inputLat = document.getElementById('lat');
+  const inputLng = document.getElementById('lng');
+  const teks = document.getElementById('koordinat-terpilih');
+
+  const penanda = L.marker([initLat, initLng], { draggable: true, autoPan: true }).addTo(map);
+  penanda.bindTooltip('Geser untuk menyesuaikan');
+
+  function tulis(latlng) {
+    const lat = latlng.lat.toFixed(6), lng = latlng.lng.toFixed(6);
+    inputLat.value = lat;
+    inputLng.value = lng;
+    if (teks) teks.textContent = `Titik saat ini: ${lat}, ${lng}`;
+  }
+  penanda.on('drag', () => tulis(penanda.getLatLng()));
+  map.on('click', (e) => { penanda.setLatLng(e.latlng); tulis(e.latlng); });
+
+  function dariInput() {
+    const lat = parseFloat(inputLat.value), lng = parseFloat(inputLng.value);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) { penanda.setLatLng([lat, lng]); map.panTo([lat, lng]); }
+  }
+  inputLat.addEventListener('change', dariInput);
+  inputLng.addEventListener('change', dariInput);
+
+  // Sembunyikan kolom slug untuk fasilitas umum (tanpa halaman detail).
+  const selJenis = document.getElementById('jenis');
+  const slugField = document.getElementById('slug-field');
+  function toggleSlug() { slugField.style.display = JENIS_SLUG.includes(selJenis.value) ? '' : 'none'; }
+  selJenis.addEventListener('change', toggleSlug);
+  toggleSlug();
+</script>

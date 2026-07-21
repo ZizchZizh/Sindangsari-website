@@ -1,6 +1,7 @@
 ---
 import Layout from '../components/Layout.astro';
 import { getAllTitikPeta, JENIS_TITIK, JENIS_TITIK_KEYS } from '../lib/db/titik-peta';
+import { mediaUrl } from '../lib/db/media';
 import batasDesa from '../data/batas-desa-sindangsari.json';
 import { getEnv } from '@lib/env';
 
@@ -26,7 +27,18 @@ const clientConfig = Object.fromEntries(
   }])
 );
 
-const finalJson = JSON.stringify(titikList);
+// Titik yang dialirkan ke klien — hanya field yang dipakai panel detail.
+const pts = titikList.map(t => ({
+  lat: t.lat,
+  lng: t.lng,
+  jenis: t.jenis,
+  label: t.label,
+  linked_slug: t.linked_slug,
+  deskripsi: t.deskripsi,
+  foto: t.cover_key ? mediaUrl(t.cover_key) : null,
+}));
+
+const finalJson = JSON.stringify(pts);
 const configJson = JSON.stringify(clientConfig);
 const batasJson = JSON.stringify(batasDesa);
 ---
@@ -77,8 +89,27 @@ const batasJson = JSON.stringify(batasDesa);
       </div>
     </aside>
 
-    <!-- Map -->
-    <div id="peta-map" class="rounded-2xl overflow-hidden border border-line shadow-[0_4px_12px_rgba(16,35,26,.10)]" style="height: min(70vh, 640px); z-index: 0;"></div>
+    <!-- Map + panel detail -->
+    <div class="relative rounded-2xl overflow-hidden border border-line shadow-[0_4px_12px_rgba(16,35,26,.10)]">
+      <div id="peta-map" style="height: min(70vh, 640px); z-index: 0;"></div>
+
+      <!-- Panel detail pin: kanan di desktop, sheet dari bawah di HP -->
+      <aside id="pin-panel" class="pin-panel" hidden aria-label="Detail lokasi">
+        <button type="button" id="pin-close" class="pin-close" aria-label="Tutup">&times;</button>
+        <div id="pin-foto-wrap" class="pin-foto-wrap" hidden>
+          <img id="pin-foto" class="pin-foto" src="" alt="" />
+        </div>
+        <div class="pin-body">
+          <span id="pin-kategori" class="pin-kategori">
+            <span id="pin-dot" class="pin-dot"></span>
+            <span id="pin-kategori-teks"></span>
+          </span>
+          <h3 id="pin-nama" class="pin-nama"></h3>
+          <p id="pin-deskripsi" class="pin-deskripsi"></p>
+          <a id="pin-link" class="pin-link" href="#" hidden>Lihat detail →</a>
+        </div>
+      </aside>
+    </div>
   </div>
 </main>
 
@@ -107,17 +138,38 @@ const batasJson = JSON.stringify(batasDesa);
   const CFG = JSON.parse(configJson);
   const points = JSON.parse(finalJson);
 
-  // Label pin berasal dari input admin dan masuk ke HTML popup — escape agar
-  // tidak jadi celah stored XSS.
-  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
-    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
-  ));
-
   // Basis tautan: '/wisata/' (prefix + slug), '/potensi' (datar), '' (tanpa detail).
   const hrefFor = (cfg, slug) => {
     if (!cfg.link) return null;
     return cfg.link.endsWith('/') ? cfg.link + slug : cfg.link;
   };
+
+  // ── Panel detail (kanan di desktop, sheet dari bawah di HP) ──
+  const panel = document.getElementById('pin-panel');
+  const elFotoWrap = document.getElementById('pin-foto-wrap');
+  const elFoto = document.getElementById('pin-foto');
+  const elDot = document.getElementById('pin-dot');
+  const elKat = document.getElementById('pin-kategori-teks');
+  const elNama = document.getElementById('pin-nama');
+  const elDesk = document.getElementById('pin-deskripsi');
+  const elLink = document.getElementById('pin-link');
+
+  function showPanel(p) {
+    const cfg = CFG[p.jenis] || { color: '#666', link: '', label: p.jenis };
+    if (p.foto) { elFoto.src = p.foto; elFoto.alt = p.label || ''; elFotoWrap.hidden = false; }
+    else { elFoto.removeAttribute('src'); elFotoWrap.hidden = true; }
+    elDot.style.background = cfg.color;
+    elKat.textContent = cfg.label;
+    elNama.textContent = p.label || cfg.label;        // textContent → aman dari XSS
+    if (p.deskripsi) { elDesk.textContent = p.deskripsi; elDesk.hidden = false; }
+    else { elDesk.hidden = true; }
+    const href = hrefFor(cfg, p.linked_slug);
+    if (href) { elLink.href = href; elLink.hidden = false; } else { elLink.hidden = true; }
+    panel.hidden = false;
+  }
+  function hidePanel() { panel.hidden = true; }
+  document.getElementById('pin-close').addEventListener('click', hidePanel);
+  map.on('click', hidePanel); // klik area kosong peta menutup panel
 
   const layers = {};
   Object.keys(CFG).forEach(k => { layers[k] = L.layerGroup(); });
@@ -129,16 +181,10 @@ const batasJson = JSON.stringify(batasDesa);
       html: `<div style="width:24px;height:24px;background:${cfg.color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.3);"></div>`,
       iconSize: [24, 24],
       iconAnchor: [12, 24],
-      popupAnchor: [0, -26]
     });
-    const href = hrefFor(cfg, p.linked_slug);
-    const judul = `<h3 style="font-family:Lexend,sans-serif;font-weight:700;color:#166534;margin:0 0 4px">${esc(p.label)}</h3>`;
-    const popup = href
-      ? `${judul}<p style="margin:0 0 6px;color:#475569;font-size:.85rem">${esc(p.desc)}</p><a href="${href}" style="color:#059669;font-weight:600;font-size:.85rem">Lihat detail →</a>`
-      : `${judul}<p style="margin:0;color:#475569;font-size:.85rem">${esc(cfg.label)}</p>`;
     if (!layers[p.jenis]) layers[p.jenis] = L.layerGroup();
     L.marker([p.lat, p.lng], { icon, title: p.label })
-      .bindPopup(popup)
+      .on('click', () => showPanel(p))
       .addTo(layers[p.jenis]);
   });
 
@@ -161,3 +207,44 @@ const batasJson = JSON.stringify(batasDesa);
 
   setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 150);
 </script>
+
+<style>
+  /* Panel detail pin — kanan (desktop) / sheet dari bawah (HP). */
+  .pin-panel {
+    position: absolute;
+    top: 12px; right: 12px; bottom: 12px;
+    width: 320px; max-width: calc(100% - 24px);
+    z-index: 500;
+    background: #fff;
+    border-radius: 16px;
+    overflow-y: auto;
+    box-shadow: 0 8px 28px rgba(16, 35, 26, .22);
+    -webkit-overflow-scrolling: touch;
+  }
+  .pin-close {
+    position: absolute; top: 8px; right: 8px; z-index: 2;
+    width: 32px; height: 32px; border-radius: 9999px;
+    background: rgba(255,255,255,.92); border: 1px solid #E2E8F0;
+    font-size: 20px; line-height: 1; color: #334155; cursor: pointer;
+    display: grid; place-items: center;
+  }
+  .pin-close:hover { background: #fff; color: #0f172a; }
+  .pin-foto-wrap { width: 100%; aspect-ratio: 4 / 3; background: #F1F5F9; }
+  .pin-foto { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pin-body { padding: 14px 16px 18px; }
+  .pin-kategori { display: inline-flex; align-items: center; gap: 6px; font-size: .75rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: .02em; }
+  .pin-dot { width: 10px; height: 10px; border-radius: 9999px; display: inline-block; }
+  .pin-nama { font-family: 'Lexend', sans-serif; font-weight: 800; color: #166534; font-size: 1.1rem; line-height: 1.25; margin: .4rem 0 .3rem; }
+  .pin-deskripsi { font-size: .9rem; color: #475569; line-height: 1.6; white-space: pre-line; margin: 0; }
+  .pin-link { display: inline-block; margin-top: .8rem; color: #059669; font-weight: 600; font-size: .9rem; }
+  .pin-link:hover { text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    .pin-panel {
+      top: auto; right: 0; left: 0; bottom: 0;
+      width: 100%; max-width: 100%;
+      max-height: 64%;
+      border-radius: 16px 16px 0 0;
+    }
+  }
+</style>

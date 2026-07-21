@@ -43,38 +43,67 @@ export const JENIS_TITIK: Record<JenisTitik, JenisTitikConfig> = {
 /** Daftar jenis yang dikenali — untuk validasi allowlist di server. */
 export const JENIS_TITIK_KEYS = Object.keys(JENIS_TITIK) as JenisTitik[];
 
-export interface TitikPeta {
+import type { WithCover } from './media';
+
+export interface TitikPeta extends WithCover {
   id: number;
   lat: number;
   lng: number;
   jenis: JenisTitik;
   linked_slug: string;
   label: string | null;
+  deskripsi: string | null;
 }
 
+/**
+ * Field yang dikirim admin. `cover_key`/`cover_thumb_key`/`cover_alt` hanya
+ * hasil JOIN media (baca-saja); hanya `cover_media_id` yang bisa di-set.
+ */
+export type TitikPetaInput = Omit<
+  TitikPeta,
+  'id' | 'cover_key' | 'cover_thumb_key' | 'cover_alt'
+>;
+
+// Foto sampul di-JOIN dalam query yang sama agar peta tidak N+1.
+const SEL = `SELECT t.*, m.r2_key_display AS cover_key, m.r2_key_thumb AS cover_thumb_key, m.alt AS cover_alt
+             FROM titik_peta t LEFT JOIN media m ON m.id = t.cover_media_id`;
+
 export async function getAllTitikPeta(db: D1Database): Promise<TitikPeta[]> {
-  const r = await db.prepare('SELECT * FROM titik_peta ORDER BY id').all<TitikPeta>();
+  const r = await db.prepare(`${SEL} ORDER BY t.id`).all<TitikPeta>();
   return r.results;
 }
 
+export async function getTitikById(id: number, db: D1Database): Promise<TitikPeta | null> {
+  return db.prepare(`${SEL} WHERE t.id=?`).bind(id).first<TitikPeta>();
+}
+
 export async function createTitikPeta(
-  data: Omit<TitikPeta, 'id'>,
+  data: TitikPetaInput,
   db: D1Database
 ): Promise<number> {
   const r = await db.prepare(
-    'INSERT INTO titik_peta (lat, lng, jenis, linked_slug, label) VALUES (?, ?, ?, ?, ?) RETURNING id'
-  ).bind(data.lat, data.lng, data.jenis, data.linked_slug, data.label).first<{ id: number }>();
+    `INSERT INTO titik_peta (lat, lng, jenis, linked_slug, label, deskripsi, cover_media_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id`
+  ).bind(
+    data.lat, data.lng, data.jenis, data.linked_slug, data.label,
+    data.deskripsi, data.cover_media_id
+  ).first<{ id: number }>();
   return r!.id;
 }
 
 export async function updateTitikPeta(
   id: number,
-  data: Omit<TitikPeta, 'id'>,
+  data: TitikPetaInput,
   db: D1Database
 ): Promise<void> {
   await db.prepare(
-    'UPDATE titik_peta SET lat=?, lng=?, jenis=?, linked_slug=?, label=? WHERE id=?'
-  ).bind(data.lat, data.lng, data.jenis, data.linked_slug, data.label, id).run();
+    `UPDATE titik_peta
+       SET lat=?, lng=?, jenis=?, linked_slug=?, label=?, deskripsi=?, cover_media_id=?
+     WHERE id=?`
+  ).bind(
+    data.lat, data.lng, data.jenis, data.linked_slug, data.label,
+    data.deskripsi, data.cover_media_id, id
+  ).run();
 }
 
 export async function deleteTitikPeta(id: number, db: D1Database): Promise<void> {

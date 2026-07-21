@@ -1,14 +1,29 @@
 ---
 import Layout from '../components/Layout.astro';
 import { getSection } from '../lib/db/page-section';
+import { getAllDemografi, ringkasDemografi, totalPenduduk } from '../lib/db/demografi';
+import batasDesa from '../data/batas-desa-sindangsari.json';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
-const [umum, geografis, sejarah] = await Promise.all([
+const [umum, geografis, sejarah, demografi] = await Promise.all([
   env ? getSection('profil-umum', env.DB) : null,
   env ? getSection('profil-geografis', env.DB) : null,
   env ? getSection('profil-sejarah', env.DB) : null,
+  env ? getAllDemografi(env.DB) : [],
 ]);
+
+// Demografi: agregat & skala grafik dihitung di server (SSR, tanpa JS klien).
+const ringkas = ringkasDemografi(demografi);
+const maxTotalRT = Math.max(1, ...demografi.map(totalPenduduk));
+const nf = new Intl.NumberFormat('id-ID');
+const pct = (n: number, total: number): number => (total > 0 ? Math.round((n / total) * 100) : 0);
+// Label ringkas per baris untuk grafik batang, mis. "Dsn I · RW03/RT01".
+const labelRT = (r: { dusun: string; rw: string; rt: string }): string => {
+  const rwRt = [r.rw && `RW${r.rw}`, r.rt && `RT${r.rt}`].filter(Boolean).join('/');
+  return [r.dusun, rwRt].filter(Boolean).join(' · ') || 'Tanpa label';
+};
+const batasJson = JSON.stringify(batasDesa);
 ---
 
 <Layout
@@ -45,6 +60,7 @@ const [umum, geografis, sejarah] = await Promise.all([
     {[
       ['#umum', 'Umum'],
       ['#geografis', 'Geografis'],
+      ['#demografi', 'Demografi'],
       ['#sejarah', 'Sejarah'],
       ['#peta', 'Peta'],
       ['/pemerintahan', 'Pemerintahan ↗'],
@@ -122,6 +138,129 @@ const [umum, geografis, sejarah] = await Promise.all([
     </div>
   </section>
 
+  <!-- Demografi -->
+  <section id="demografi" style="scroll-margin-top: 120px;">
+    <h2 class="text-2xl font-heading font-extrabold text-primary">Demografi Penduduk</h2>
+    <p class="text-muted mt-2 max-w-3xl leading-relaxed">
+      Persebaran penduduk Desa Sindangsari berdasarkan data per RT — jumlah jiwa, komposisi jenis
+      kelamin, dan jumlah kepala keluarga (KK).
+    </p>
+
+    {demografi.length === 0 ? (
+      <div class="mt-6 bg-white border border-line rounded-2xl p-8 text-center shadow-[0_4px_10px_rgba(16,35,26,.08)]">
+        <i data-lucide="pie-chart" class="w-8 h-8 text-accent mx-auto"></i>
+        <p class="font-heading font-semibold text-ink mt-3">Data demografi sedang dilengkapi</p>
+        <p class="text-muted text-sm mt-1 max-w-md mx-auto">
+          Rincian jumlah penduduk per RT akan segera ditampilkan di sini dalam bentuk grafik dan tabel.
+        </p>
+      </div>
+    ) : (
+      <div class="mt-6 space-y-8">
+
+        <!-- Kartu ringkasan -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {[
+            { icon: 'users', label: 'Total Penduduk', value: ringkas.totalPenduduk, sub: 'Jiwa' },
+            { icon: 'user', label: 'Laki-laki', value: ringkas.totalLaki, sub: `${pct(ringkas.totalLaki, ringkas.totalPenduduk)}%` },
+            { icon: 'user', label: 'Perempuan', value: ringkas.totalPerempuan, sub: `${pct(ringkas.totalPerempuan, ringkas.totalPenduduk)}%` },
+            { icon: 'home', label: 'Kepala Keluarga', value: ringkas.totalKK, sub: 'KK' },
+          ].map(s => (
+            <div class="bg-white border border-line rounded-2xl p-5 shadow-[0_4px_10px_rgba(16,35,26,.08)]">
+              <i data-lucide={s.icon} class="w-6 h-6 text-accent"></i>
+              <p class="font-heading font-extrabold text-2xl text-primary mt-2 tabular-nums">{nf.format(s.value)}</p>
+              <p class="text-xs font-heading font-semibold text-muted uppercase mt-0.5">{s.sub}</p>
+              <p class="text-sm text-ink mt-0.5">{s.label}</p>
+            </div>
+          ))}
+        </div>
+
+        <!-- Komposisi jenis kelamin -->
+        <div class="bg-white border border-line rounded-2xl p-6 shadow-[0_4px_10px_rgba(16,35,26,.08)]">
+          <h3 class="font-heading font-bold text-lg text-primary">Komposisi Jenis Kelamin</h3>
+          <div class="flex h-8 rounded-full overflow-hidden border border-line mt-4" role="img"
+            aria-label={`Laki-laki ${nf.format(ringkas.totalLaki)} jiwa, Perempuan ${nf.format(ringkas.totalPerempuan)} jiwa`}>
+            <div style={`width:${pct(ringkas.totalLaki, ringkas.totalPenduduk)}%; background:#166534;`}></div>
+            <div class="flex-1" style="background:#D97706;"></div>
+          </div>
+          <div class="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-sm">
+            <span class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-sm shrink-0" style="background:#166534;"></span>
+              <span class="text-ink">Laki-laki</span>
+              <span class="text-muted tabular-nums">{nf.format(ringkas.totalLaki)} · {pct(ringkas.totalLaki, ringkas.totalPenduduk)}%</span>
+            </span>
+            <span class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-sm shrink-0" style="background:#D97706;"></span>
+              <span class="text-ink">Perempuan</span>
+              <span class="text-muted tabular-nums">{nf.format(ringkas.totalPerempuan)} · {pct(ringkas.totalPerempuan, ringkas.totalPenduduk)}%</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Persebaran penduduk per RT -->
+        <div class="bg-white border border-line rounded-2xl p-6 shadow-[0_4px_10px_rgba(16,35,26,.08)]">
+          <h3 class="font-heading font-bold text-lg text-primary">Persebaran Penduduk per RT</h3>
+          <p class="text-sm text-muted mt-1">Jumlah jiwa di tiap RT.</p>
+          <div class="mt-5 space-y-3">
+            {demografi.map(r => (
+              <div class="flex items-center gap-3">
+                <div class="w-24 sm:w-44 shrink-0 text-xs sm:text-sm text-ink truncate" title={labelRT(r)}>{labelRT(r)}</div>
+                <div class="flex-1 bg-sand rounded-full h-6 overflow-hidden">
+                  <div class="h-full rounded-full" style={`width:${Math.max(pct(totalPenduduk(r), maxTotalRT), 4)}%; background:var(--color-accent);`}></div>
+                </div>
+                <div class="w-14 shrink-0 text-right text-sm font-heading font-bold tabular-nums text-primary">{nf.format(totalPenduduk(r))}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <!-- Tabel rinci per RT -->
+        <div class="bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(16,35,26,.08)]">
+          <div class="px-6 pt-6">
+            <h3 class="font-heading font-bold text-lg text-primary">Rincian per RT</h3>
+          </div>
+          <div class="overflow-x-auto mt-4">
+            <table class="w-full text-sm">
+              <thead style="background:#F8FAFC;">
+                <tr class="border-y border-line text-muted">
+                  <th class="text-left px-4 py-3 font-heading font-semibold">Dusun</th>
+                  <th class="text-center px-4 py-3 font-heading font-semibold">RW</th>
+                  <th class="text-center px-4 py-3 font-heading font-semibold">RT</th>
+                  <th class="text-right px-4 py-3 font-heading font-semibold">Laki-laki</th>
+                  <th class="text-right px-4 py-3 font-heading font-semibold">Perempuan</th>
+                  <th class="text-right px-4 py-3 font-heading font-semibold">Total</th>
+                  <th class="text-right px-4 py-3 font-heading font-semibold">KK</th>
+                </tr>
+              </thead>
+              <tbody>
+                {demografi.map(r => (
+                  <tr class="border-b border-line last:border-0">
+                    <td class="px-4 py-3 text-ink">{r.dusun || '—'}</td>
+                    <td class="px-4 py-3 text-center text-muted tabular-nums">{r.rw || '—'}</td>
+                    <td class="px-4 py-3 text-center text-muted tabular-nums">{r.rt || '—'}</td>
+                    <td class="px-4 py-3 text-right tabular-nums">{nf.format(r.laki_laki)}</td>
+                    <td class="px-4 py-3 text-right tabular-nums">{nf.format(r.perempuan)}</td>
+                    <td class="px-4 py-3 text-right tabular-nums font-semibold text-primary">{nf.format(totalPenduduk(r))}</td>
+                    <td class="px-4 py-3 text-right tabular-nums">{nf.format(r.jumlah_kk)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr class="border-t-2 border-line font-heading font-bold" style="background:#F8FAFC;">
+                  <td class="px-4 py-3 text-primary" colspan="3">Total ({nf.format(ringkas.jumlahRT)} RT)</td>
+                  <td class="px-4 py-3 text-right tabular-nums text-primary">{nf.format(ringkas.totalLaki)}</td>
+                  <td class="px-4 py-3 text-right tabular-nums text-primary">{nf.format(ringkas.totalPerempuan)}</td>
+                  <td class="px-4 py-3 text-right tabular-nums text-primary">{nf.format(ringkas.totalPenduduk)}</td>
+                  <td class="px-4 py-3 text-right tabular-nums text-primary">{nf.format(ringkas.totalKK)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    )}
+  </section>
+
   <!-- Sejarah -->
   <section id="sejarah" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Sejarah Desa</h2>
@@ -162,10 +301,16 @@ const [umum, geografis, sejarah] = await Promise.all([
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script is:inline>
+<script define:vars={{ batasJson }}>
   document.addEventListener('DOMContentLoaded', function() {
     var map = L.map('profil-map', { scrollWheelZoom: false }).setView([-6.7022, 107.7414], 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+    // Batas wilayah desa dari shapefile resmi (WGS84).
+    var batas = L.geoJSON(JSON.parse(batasJson), {
+      style: { color: '#166534', weight: 3, opacity: 0.9, fillColor: '#166534', fillOpacity: 0.06 },
+      interactive: false
+    }).addTo(map);
+    map.fitBounds(batas.getBounds(), { padding: [16, 16] });
     L.marker([-6.7022, 107.7414]).addTo(map).bindPopup('<b>Desa Sindangsari</b><br>Kec. Kasomalang, Subang');
     if (typeof lucide !== 'undefined') lucide.createIcons();
   });

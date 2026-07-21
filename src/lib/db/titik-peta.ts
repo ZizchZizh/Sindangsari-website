@@ -1,8 +1,53 @@
+export type JenisTitik =
+  | 'wisata'
+  | 'umkm'
+  | 'potensi'
+  | 'ibadah'
+  | 'pendidikan'
+  | 'kesehatan'
+  | 'pemerintahan'
+  | 'makam';
+
+export interface JenisTitikConfig {
+  /** Label manusiawi untuk legenda peta & subjudul popup. */
+  label: string;
+  /** Warna penanda di peta. */
+  color: string;
+  /** Ikon Lucide untuk panel filter. */
+  icon: string;
+  /**
+   * Basis tautan detail:
+   *   - berakhiran '/'  → prefix, slug ditempel di belakang (mis. '/wisata/')
+   *   - tanpa '/' akhir → tautan datar, slug diabaikan (mis. '/potensi')
+   *   - string kosong   → tidak punya halaman detail (fasilitas umum)
+   */
+  link: string;
+}
+
+/**
+ * Sumber kebenaran tunggal untuk jenis titik peta — dipakai halaman publik
+ * (`peta.astro`), form admin (`admin/peta`), dan validasi route API.
+ * `jenis` di DB hanyalah TEXT tanpa CHECK, jadi daftar inilah penegaknya.
+ */
+export const JENIS_TITIK: Record<JenisTitik, JenisTitikConfig> = {
+  wisata:       { label: 'Wisata',        color: '#0D9488', icon: 'palmtree',       link: '/wisata/' },
+  umkm:         { label: 'UMKM',          color: '#15803D', icon: 'store',          link: '/umkm/' },
+  potensi:      { label: 'Potensi',       color: '#B45309', icon: 'sprout',         link: '/potensi' },
+  ibadah:       { label: 'Tempat Ibadah', color: '#059669', icon: 'moon-star',      link: '' },
+  pendidikan:   { label: 'Pendidikan',    color: '#2563EB', icon: 'graduation-cap', link: '' },
+  kesehatan:    { label: 'Kesehatan',     color: '#DC2626', icon: 'heart-pulse',    link: '' },
+  pemerintahan: { label: 'Pemerintahan',  color: '#7C3AED', icon: 'landmark',       link: '' },
+  makam:        { label: 'Makam',         color: '#64748B', icon: 'flower',         link: '' },
+};
+
+/** Daftar jenis yang dikenali — untuk validasi allowlist di server. */
+export const JENIS_TITIK_KEYS = Object.keys(JENIS_TITIK) as JenisTitik[];
+
 export interface TitikPeta {
   id: number;
   lat: number;
   lng: number;
-  jenis: 'wisata' | 'umkm' | 'potensi';
+  jenis: JenisTitik;
   linked_slug: string;
   label: string | null;
 }

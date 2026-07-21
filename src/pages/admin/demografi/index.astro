@@ -1,0 +1,196 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { getAllDemografi, ringkasDemografi, totalPenduduk } from '../../../lib/db/demografi';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const rows = env ? await getAllDemografi(env.DB) : [];
+const ringkas = ringkasDemografi(rows);
+
+const saved = Astro.url.searchParams.get('saved');
+const deleted = Astro.url.searchParams.get('deleted');
+const error = Astro.url.searchParams.get('error');
+
+// Urutan berikutnya diusulkan otomatis agar admin tidak perlu menebak.
+const urutanBerikutnya = rows.length > 0 ? Math.max(...rows.map(r => r.urutan)) + 1 : 1;
+
+const nf = new Intl.NumberFormat('id-ID');
+---
+
+<AdminLayout title="Demografi" breadcrumb="Demografi Penduduk">
+
+  {saved && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">
+      Perubahan berhasil disimpan.
+    </div>
+  )}
+  {deleted && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">
+      Data RT berhasil dihapus.
+    </div>
+  )}
+  {error && (
+    <div role="alert" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#FEE2E2; color:#991B1B; border:1px solid #FECACA;">
+      Minimal isi salah satu dari Dusun/RW/RT. Angka penduduk & KK harus bilangan bulat ≥ 0.
+    </div>
+  )}
+
+  <div class="mb-6">
+    <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">Demografi Penduduk per RT</h2>
+    <p class="text-sm text-text-muted mt-1">
+      Data ini tampil sebagai grafik & tabel di section <strong>Demografi</strong> halaman
+      <a href="/profil#demografi" target="_blank" rel="noopener" class="underline">Profil</a>.
+      Total penduduk dihitung otomatis dari Laki-laki + Perempuan.
+    </p>
+  </div>
+
+  {rows.length > 0 && (
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+      {[
+        { label: 'Total Penduduk', value: ringkas.totalPenduduk },
+        { label: 'Laki-laki', value: ringkas.totalLaki },
+        { label: 'Perempuan', value: ringkas.totalPerempuan },
+        { label: 'Jumlah KK', value: ringkas.totalKK },
+      ].map(s => (
+        <div class="bg-white rounded-xl border border-border p-4" style="box-shadow:var(--shadow-sm);">
+          <p class="text-xs font-heading font-semibold text-text-muted uppercase">{s.label}</p>
+          <p class="font-heading font-extrabold text-xl mt-1 tabular-nums" style="color:var(--color-primary);">{nf.format(s.value)}</p>
+        </div>
+      ))}
+    </div>
+  )}
+
+  <div class="grid gap-6 lg:grid-cols-[1.7fr_1fr] items-start">
+
+    <!-- ── Daftar RT ── -->
+    <div class="bg-white rounded-xl border border-border overflow-hidden" style="box-shadow:var(--shadow-sm);">
+      {rows.length === 0 ? (
+        <div class="p-8 text-center text-text-muted">
+          Belum ada data demografi. Tambahkan data per RT lewat form di samping —
+          nanti otomatis muncul sebagai grafik di halaman Profil.
+        </div>
+      ) : (
+        <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead style="background:#F8FAFC;">
+            <tr class="border-b border-border">
+              <th class="text-left px-3 py-3 font-heading font-semibold w-12">#</th>
+              <th class="text-left px-3 py-3 font-heading font-semibold">Dusun</th>
+              <th class="text-center px-3 py-3 font-heading font-semibold">RW</th>
+              <th class="text-center px-3 py-3 font-heading font-semibold">RT</th>
+              <th class="text-right px-3 py-3 font-heading font-semibold">L</th>
+              <th class="text-right px-3 py-3 font-heading font-semibold">P</th>
+              <th class="text-right px-3 py-3 font-heading font-semibold">Total</th>
+              <th class="text-right px-3 py-3 font-heading font-semibold">KK</th>
+              <th class="px-3 py-3 font-heading font-semibold">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr class="border-b border-border last:border-0 hover:bg-sand/30 transition-colors">
+                <td class="px-3 py-3 text-text-muted tabular-nums">{r.urutan}</td>
+                <td class="px-3 py-3 font-medium">{r.dusun || <span class="text-text-muted">—</span>}</td>
+                <td class="px-3 py-3 text-center tabular-nums">{r.rw || '—'}</td>
+                <td class="px-3 py-3 text-center tabular-nums">{r.rt || '—'}</td>
+                <td class="px-3 py-3 text-right tabular-nums">{nf.format(r.laki_laki)}</td>
+                <td class="px-3 py-3 text-right tabular-nums">{nf.format(r.perempuan)}</td>
+                <td class="px-3 py-3 text-right tabular-nums font-semibold" style="color:var(--color-primary);">{nf.format(totalPenduduk(r))}</td>
+                <td class="px-3 py-3 text-right tabular-nums">{nf.format(r.jumlah_kk)}</td>
+                <td class="px-3 py-3">
+                  <div class="flex items-center justify-center gap-2">
+                    <a href={`/admin/demografi/${r.id}`}
+                      class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border transition-colors hover:bg-primary hover:text-white"
+                      style="border-color:var(--color-primary); color:var(--color-primary);">
+                      Sunting
+                    </a>
+                    <form method="POST" action="/api/admin/demografi/delete"
+                      onsubmit="return confirm('Hapus data RT ini? Tindakan tidak dapat dibatalkan.')">
+                      <input type="hidden" name="id" value={String(r.id)} />
+                      <button type="submit"
+                        class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border cursor-pointer hover:bg-red-50 hover:text-red-600"
+                        style="border-color:#FECACA; color:#DC2626;">
+                        Hapus
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        </div>
+      )}
+    </div>
+
+    <!-- ── Tambah RT ── -->
+    <div class="bg-white rounded-xl border border-border p-5" style="box-shadow:var(--shadow-sm);">
+      <h3 class="font-heading font-semibold" style="color:var(--color-primary);">Tambah Data RT</h3>
+
+      <form method="POST" action="/api/admin/demografi" class="space-y-4 mt-4">
+        <div>
+          <label for="dusun" class="block font-heading font-medium text-sm mb-1.5">Dusun</label>
+          <input type="text" id="dusun" name="dusun"
+            class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+            style="border-color:var(--color-border); min-height:44px;"
+            placeholder="cth. Dusun I / Sindangsari" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="rw" class="block font-heading font-medium text-sm mb-1.5">RW</label>
+            <input type="text" id="rw" name="rw" inputmode="numeric"
+              class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+              style="border-color:var(--color-border); min-height:44px;"
+              placeholder="cth. 03" />
+          </div>
+          <div>
+            <label for="rt" class="block font-heading font-medium text-sm mb-1.5">RT</label>
+            <input type="text" id="rt" name="rt" inputmode="numeric"
+              class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+              style="border-color:var(--color-border); min-height:44px;"
+              placeholder="cth. 01" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="laki_laki" class="block font-heading font-medium text-sm mb-1.5">Laki-laki</label>
+            <input type="number" id="laki_laki" name="laki_laki" min="0" step="1" value="0"
+              class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+              style="border-color:var(--color-border); min-height:44px;" />
+          </div>
+          <div>
+            <label for="perempuan" class="block font-heading font-medium text-sm mb-1.5">Perempuan</label>
+            <input type="number" id="perempuan" name="perempuan" min="0" step="1" value="0"
+              class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+              style="border-color:var(--color-border); min-height:44px;" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="jumlah_kk" class="block font-heading font-medium text-sm mb-1.5">Jumlah KK</label>
+            <input type="number" id="jumlah_kk" name="jumlah_kk" min="0" step="1" value="0"
+              class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+              style="border-color:var(--color-border); min-height:44px;" />
+          </div>
+          <div>
+            <label for="urutan" class="block font-heading font-medium text-sm mb-1.5">Urutan</label>
+            <input type="number" id="urutan" name="urutan" min="0" step="1" value={String(urutanBerikutnya)}
+              class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+              style="border-color:var(--color-border); min-height:44px;" />
+          </div>
+        </div>
+        <p class="text-xs text-text-muted">Angka urutan kecil tampil lebih dulu di grafik & tabel.</p>
+
+        <button type="submit"
+          class="w-full px-5 py-2 rounded-lg font-heading font-semibold text-white text-sm cursor-pointer"
+          style="background:var(--color-cta); min-height:44px;">
+          Tambah Data RT
+        </button>
+      </form>
+    </div>
+
+  </div>
+
+</AdminLayout>

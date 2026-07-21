@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+  <Document>
+    <Schema id="schema0" name="schema0">
+      <SimpleField name="Description" type="string"/>
+      <SimpleField name="pdfmaps_photos" type="string">
+        <displayName>Photos</displayName>
+      </SimpleField>
+    </Schema>
+    <Folder>
+      <styleUrl>#style0</styleUrl>
+      <name>Lapisan 1</name>
+      <ExtendedData>
+        <SchemaData schemaUrl="#schema0"/>
+      </ExtendedData>
+      <Placemark>
+        <name>kantor desa</name>
+        <TimeStamp>
+          <when>2026-07-14T16:01:16+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.743245977073,-6.70055700183768,445.996429443359
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>klinik bima medika</name>
+        <TimeStamp>
+          <when>2026-07-14T16:59:29+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.732639664496,-6.70306718816583,469.994415283203
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Makam 1</name>
+        <TimeStamp>
+          <when>2026-07-14T15:48:55+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.734005403697,-6.70537520624792,464.554351806641
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>makam 3</name>
+        <TimeStamp>
+          <when>2026-07-14T16:47:45+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.739759190426,-6.70010753401841,456.19140625
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>makam pasir</name>
+        <TimeStamp>
+          <when>2026-07-14T16:33:17+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.746905481685,-6.70331248449344,443.83935546875
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>masjid</name>
+        <TimeStamp>
+          <when>2026-07-17T15:43:56+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.742708822696,-6.70002759420958,445.347564697266
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>masjid 1</name>
+        <TimeStamp>
+          <when>2026-07-14T15:51:07+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.735592,-6.704373,462.742797851562
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>masjid 3</name>
+        <TimeStamp>
+          <when>2026-07-14T17:23:40+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.734546552655,-6.7049725332482,465.331237792969
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>masjid al aqsho</name>
+        <TimeStamp>
+          <when>2026-07-14T17:06:04+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.729062,-6.706749,479.272491455078
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>masjid al baroqah</name>
+        <TimeStamp>
+          <when>2026-07-14T16:05:13+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.743488381119,-6.70053412746071,446.120208740234
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>masjid jami nurul huda</name>
+        <TimeStamp>
+          <when>2026-07-14T16:08:24+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.749026019764,-6.70147739910279,432.694030761719
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>mi mq an nuur</name>
+        <TimeStamp>
+          <when>2026-07-14T15:56:26+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.740982,-6.701142,452.059509277344
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>posyandu ?</name>
+        <TimeStamp>
+          <when>2026-07-17T15:34:51+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.735482,-6.704455,463.330749511719
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>posyandu ?</name>
+        <TimeStamp>
+          <when>2026-07-17T15:50:11+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.742360730088,-6.70074569732947,449.343200683594
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>posyandu bayam 1</name>
+        <TimeStamp>
+          <when>2026-07-17T15:30:24+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.729901103333,-6.70707347766239,473.356018066406
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>posyandu bayam 2</name>
+        <TimeStamp>
+          <when>2026-07-17T15:24:22+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.731276216894,-6.70445638317336,472.974456787109
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Posyandu Bayam 5</name>
+        <TimeStamp>
+          <when>2026-07-17T16:12:56+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.750313150364,-6.70164974061416,428.060943603516
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>posyandu bayam 7</name>
+        <TimeStamp>
+          <when>2026-07-19T15:24:53+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.741556531912,-6.7048058196361,446.79296875
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Posyandu Bayam 8</name>
+        <TimeStamp>
+          <when>2026-07-17T16:19:16+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.746076666667,-6.70630000000002,408.756317138672
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Poyandu Bayam VI </name>
+        <TimeStamp>
+          <when>2026-07-17T16:09:58+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.751903315976,-6.70196621751179,423.072570800781
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>sdn darmaga 2</name>
+        <TimeStamp>
+          <when>2026-07-14T16:43:35+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.742565,-6.702976,446
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>sdn darmaga 3</name>
+        <TimeStamp>
+          <when>2026-07-14T16:11:14+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.747601949483,-6.70110415774974,438.247589111328
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>sdn darmaga 4</name>
+        <TimeStamp>
+          <when>2026-07-14T16:53:20+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.738905987592,-6.70052886991667,456.021118164062
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>sdn sukamaju</name>
+        <TimeStamp>
+          <when>2026-07-14T17:01:20+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.731967271658,-6.70358712747619,475.828552246094
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>sma nurul gina</name>
+        <TimeStamp>
+          <when>2026-07-14T16:38:12+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.744559674534,-6.70355804696779,436.270263671875
+          </coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>smp smk citra tri tunggal</name>
+        <TimeStamp>
+          <when>2026-07-14T16:51:33+07:00</when>
+        </TimeStamp>
+        <styleUrl>#style1</styleUrl>
+        <Point>
+          <coordinates>
+            107.739269,-6.700095,453.021636962891
+          </coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Style id="style0">
+      <IconStyle>
+        <color>802f80ff</color>
+        <Icon>
+          <href>http://download.avenza.com/images/pdfmaps_icons/red_pin.png</href>
+        </Icon>
+        <hotSpot x="0.5" xunits="fraction" y="0.5" yunits="fraction"/>
+      </IconStyle>
+      <LineStyle>
+        <color>ff2f80ff</color>
+        <width>4</width>
+      </LineStyle>
+      <PolyStyle>
+        <color>802f80ff</color>
+      </PolyStyle>
+    </Style>
+    <Style id="style1">
+      <IconStyle>
+        <Icon>
+          <href>http://download.avenza.com/images/pdfmaps_icons/red_pin.png</href>
+        </Icon>
+        <hotSpot x="0.5" xunits="fraction" y="0.5" yunits="fraction"/>
+      </IconStyle>
+    </Style>
+  </Document>
+</kml>

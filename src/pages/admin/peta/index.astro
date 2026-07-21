@@ -1,13 +1,24 @@
 ---
 import AdminLayout from '../../../components/AdminLayout.astro';
-import { getAllTitikPeta } from '../../../lib/db/titik-peta';
+import { getAllTitikPeta, JENIS_TITIK, JENIS_TITIK_KEYS } from '../../../lib/db/titik-peta';
+import batasDesa from '../../../data/batas-desa-sindangsari.json';
 
 import { getEnv } from '@lib/env';
 const env = getEnv();
 const titikList = env ? await getAllTitikPeta(env.DB) : [];
 const saved = Astro.url.searchParams.get('saved');
 const deleted = Astro.url.searchParams.get('deleted');
+const error = Astro.url.searchParams.get('error');
 const titikJson = JSON.stringify(titikList);
+
+// Warna per jenis untuk penanda di peta admin.
+const colorsJson = JSON.stringify(
+  Object.fromEntries(JENIS_TITIK_KEYS.map(k => [k, JENIS_TITIK[k].color]))
+);
+// Jenis yang punya halaman detail (butuh slug) vs fasilitas (tanpa slug).
+const jenisPakaiSlug = JENIS_TITIK_KEYS.filter(k => JENIS_TITIK[k].link !== '');
+const slugJson = JSON.stringify(jenisPakaiSlug);
+const batasJson = JSON.stringify(batasDesa);
 ---
 
 <AdminLayout title="Kelola Peta" breadcrumb="Peta">
@@ -20,6 +31,11 @@ const titikJson = JSON.stringify(titikList);
   {deleted && (
     <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">
       Titik peta berhasil dihapus.
+    </div>
+  )}
+  {error && (
+    <div role="alert" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#FEE2E2; color:#991B1B; border:1px solid #FECACA;">
+      Gagal menyimpan. Pastikan jenis dipilih, koordinat terisi, dan (untuk Wisata/UMKM/Potensi) slug diisi.
     </div>
   )}
 
@@ -56,16 +72,18 @@ const titikJson = JSON.stringify(titikList);
           <select id="jenis" name="jenis" required
             class="w-full rounded-lg border px-4 py-2.5 text-base focus:outline-none"
             style="border-color:var(--color-border); min-height:44px;">
-            <option value="wisata">Wisata</option>
-            <option value="umkm">UMKM</option>
-            <option value="potensi">Potensi</option>
+            {JENIS_TITIK_KEYS.map(k => <option value={k}>{JENIS_TITIK[k].label}</option>)}
           </select>
         </div>
-        <div>
-          <label for="linked_slug" class="block font-heading font-medium text-sm mb-1.5">Slug Entitas <span>*</span></label>
-          <input type="text" id="linked_slug" name="linked_slug" required
+        <div id="slug-field">
+          <label for="linked_slug" class="block font-heading font-medium text-sm mb-1.5">Slug Entitas</label>
+          <input type="text" id="linked_slug" name="linked_slug"
             class="w-full rounded-lg border px-4 py-2.5 text-base focus:outline-none"
             style="border-color:var(--color-border); min-height:44px;" placeholder="cth. curug-masigit" />
+          <p class="text-xs text-text-muted mt-1">
+            Hanya untuk <strong>Wisata/UMKM/Potensi</strong> — hubungkan penanda ke halaman detailnya.
+            Fasilitas umum (ibadah, sekolah, kesehatan, dll.) tidak perlu slug.
+          </p>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
@@ -109,13 +127,12 @@ const titikJson = JSON.stringify(titikList);
           <tr class="border-b border-border last:border-0 hover:bg-sand/30">
             <td class="px-4 py-3 font-medium">{t.label ?? '—'}</td>
             <td class="px-4 py-3">
-              <span class:list={['inline-flex px-2 py-0.5 rounded-full text-xs font-medium',
-                t.jenis === 'wisata'  ? 'bg-teal-100 text-teal-700' :
-                t.jenis === 'umkm'   ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700']}>
-                {t.jenis}
+              <span class="inline-flex items-center gap-1.5 text-xs font-medium whitespace-nowrap">
+                <span class="w-2.5 h-2.5 rounded-full shrink-0" style={`background:${JENIS_TITIK[t.jenis]?.color ?? '#666'};`}></span>
+                {JENIS_TITIK[t.jenis]?.label ?? t.jenis}
               </span>
             </td>
-            <td class="px-4 py-3 text-text-muted hidden md:table-cell">{t.linked_slug}</td>
+            <td class="px-4 py-3 text-text-muted hidden md:table-cell">{t.linked_slug || '—'}</td>
             <td class="px-4 py-3 text-text-muted hidden md:table-cell text-xs">{t.lat.toFixed(4)}, {t.lng.toFixed(4)}</td>
             <td class="px-4 py-3">
               <form method="POST" action="/api/admin/peta/delete"
@@ -143,12 +160,21 @@ const titikJson = JSON.stringify(titikList);
      curl -sL <url> | openssl dgst -sha256 -binary | openssl base64 -A -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-<script define:vars={{ titikJson }}>
+<script define:vars={{ titikJson, colorsJson, slugJson, batasJson }}>
   const titiks = JSON.parse(titikJson);
+  const JENIS_SLUG = JSON.parse(slugJson);
   const map = L.map('admin-map').setView([-6.7022, 107.7414], 14);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
   }).addTo(map);
+
+  // Batas wilayah desa (referensi visual saat menaruh pin) — tidak interaktif
+  // agar tidak menghalangi klik penempatan koordinat di peta.
+  const batasLayer = L.geoJSON(JSON.parse(batasJson), {
+    style: { color: '#166534', weight: 2.5, opacity: 0.9, fillColor: '#166534', fillOpacity: 0.05 },
+    interactive: false
+  }).addTo(map);
+  map.fitBounds(batasLayer.getBounds(), { padding: [16, 16] });
 
   const inputLat = document.getElementById('lat');
   const inputLng = document.getElementById('lng');
@@ -161,7 +187,7 @@ const titikJson = JSON.stringify(titikList);
   ));
 
   // ── Titik yang sudah tersimpan (hanya tampilan) ──
-  const colors = { wisata: '#0D9488', umkm: '#15803D', potensi: '#B45309' };
+  const colors = JSON.parse(colorsJson);
   titiks.forEach(t => {
     const icon = L.circleMarker([t.lat, t.lng], {
       radius: 8, fillColor: colors[t.jenis] ?? '#666', color: '#fff',
@@ -211,4 +237,13 @@ const titikJson = JSON.stringify(titikList);
   }
   inputLat.addEventListener('change', dariInput);
   inputLng.addEventListener('change', dariInput);
+
+  // Sembunyikan kolom "Slug Entitas" untuk fasilitas umum (tanpa halaman detail).
+  const selJenis = document.getElementById('jenis');
+  const slugField = document.getElementById('slug-field');
+  function toggleSlug() {
+    slugField.style.display = JENIS_SLUG.includes(selJenis.value) ? '' : 'none';
+  }
+  selJenis.addEventListener('change', toggleSlug);
+  toggleSlug();
 </script>

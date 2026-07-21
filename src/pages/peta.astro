@@ -1,32 +1,34 @@
 ---
 import Layout from '../components/Layout.astro';
-import { getAllTitikPeta } from '../lib/db/titik-peta';
+import { getAllTitikPeta, JENIS_TITIK, JENIS_TITIK_KEYS } from '../lib/db/titik-peta';
+import batasDesa from '../data/batas-desa-sindangsari.json';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
 const titikList = env ? await getAllTitikPeta(env.DB) : [];
-const titikJson = JSON.stringify(titikList);
 
-const counts = { wisata: 0, umkm: 0, potensi: 0 };
-for (const t of titikList) {
-  if (t.jenis in counts) counts[t.jenis as keyof typeof counts]++;
-}
+// Hitung jumlah titik per jenis untuk badge di panel filter.
+const counts: Record<string, number> = Object.fromEntries(JENIS_TITIK_KEYS.map(k => [k, 0]));
+for (const t of titikList) counts[t.jenis] = (counts[t.jenis] ?? 0) + 1;
 
-const demoPoints = [
-  { jenis: 'wisata', label: 'Curug Masigit', lat: -6.7150, lng: 107.7350, linked_slug: 'curug-masigit', desc: 'Air terjun eksotis di Desa Pasanggrahan, selatan Sindangsari.' },
-  { jenis: 'wisata', label: 'Ekowisata Kasomalang', lat: -6.7100, lng: 107.7300, linked_slug: 'ekowisata-alam-kasomalang', desc: 'Ekowisata alam pegunungan.' },
-  { jenis: 'wisata', label: 'Panorama Sawah Sindangsari', lat: -6.7000, lng: 107.7450, linked_slug: 'panorama-sawah-sindangsari', desc: 'Pemandangan sawah dataran tinggi.' },
-  { jenis: 'umkm', label: 'Kerupuk, Opak & Ranginang', lat: -6.7010, lng: 107.7420, linked_slug: 'kerupuk-opak-ranginang', desc: 'Makanan tradisional khas Sunda — Kp. Limaratus.' },
-  { jenis: 'umkm', label: 'Kopi Aren Kasomalang', lat: -6.7030, lng: 107.7400, linked_slug: 'kopi-aren-kasomalang', desc: 'Kuliner — kopi aren dataran tinggi.' },
-  { jenis: 'potensi', label: 'Sawah Sindangsari', lat: -6.7050, lng: 107.7380, linked_slug: 'potensi', desc: 'Potensi pertanian padi — 161 ha sawah.' },
-  { jenis: 'potensi', label: 'Kebun Buah', lat: -6.6990, lng: 107.7440, linked_slug: 'potensi', desc: 'Alpukat, durian, jeruk bali, nangka, dan nanas.' },
-];
+// Panel filter hanya menampilkan jenis yang punya titik, tapi tiga jenis inti
+// (wisata/umkm/potensi) selalu tampil agar peta konsisten walau datanya kosong.
+const jenisTampil = JENIS_TITIK_KEYS.filter(
+  k => counts[k] > 0 || k === 'wisata' || k === 'umkm' || k === 'potensi'
+);
 
-const finalPoints = titikList.length > 0 ? titikList : demoPoints;
-const finalJson = JSON.stringify(finalPoints);
-const finalCounts = titikList.length > 0
-  ? counts
-  : { wisata: demoPoints.filter(p => p.jenis === 'wisata').length, umkm: demoPoints.filter(p => p.jenis === 'umkm').length, potensi: demoPoints.filter(p => p.jenis === 'potensi').length };
+// Konfigurasi ringkas (warna + basis tautan) yang diserahkan ke skrip klien.
+const clientConfig = Object.fromEntries(
+  JENIS_TITIK_KEYS.map(k => [k, {
+    color: JENIS_TITIK[k].color,
+    link: JENIS_TITIK[k].link,
+    label: JENIS_TITIK[k].label,
+  }])
+);
+
+const finalJson = JSON.stringify(titikList);
+const configJson = JSON.stringify(clientConfig);
+const batasJson = JSON.stringify(batasDesa);
 ---
 
 <Layout
@@ -36,28 +38,30 @@ const finalCounts = titikList.length > 0
 
 <main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-6">
   <h1 class="text-2xl sm:text-3xl font-heading font-extrabold text-primary">Peta Desa Sindangsari</h1>
-  <p class="text-muted mt-1">Jelajahi titik wisata, UMKM, dan potensi desa. Klik penanda untuk detail.</p>
+  <p class="text-muted mt-1">Jelajahi titik wisata, UMKM, potensi, dan fasilitas umum desa (tempat ibadah, sekolah, kesehatan, dan lainnya). Klik penanda untuk info.</p>
 
   <div class="grid lg:grid-cols-[280px_1fr] gap-5 mt-5">
     <!-- Filter panel -->
     <aside class="bg-white border border-line rounded-2xl p-5 h-max shadow-[0_4px_10px_rgba(16,35,26,.08)]">
       <h2 class="font-heading font-semibold text-ink">Tampilkan</h2>
       <div class="space-y-2 mt-3">
-        {[
-          { type: 'wisata', label: 'Wisata', icon: 'palmtree', color: '#0D9488', count: finalCounts.wisata },
-          { type: 'umkm', label: 'UMKM', icon: 'store', color: '#15803D', count: finalCounts.umkm },
-          { type: 'potensi', label: 'Potensi', icon: 'sprout', color: '#B45309', count: finalCounts.potensi },
-        ].map(item => (
+        {jenisTampil.map(k => (
           <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-sand cursor-pointer">
-            <input type="checkbox" class="filter-check w-4 h-4 rounded text-accent" data-type={item.type} checked />
-            <span class="w-7 h-7 rounded-full grid place-items-center shrink-0" style={`background:${item.color}; transform:rotate(-45deg);`}>
-              <i data-lucide={item.icon} class="w-3.5 h-3.5 text-white" style="transform:rotate(45deg);"></i>
+            <input type="checkbox" class="filter-check w-4 h-4 rounded text-accent" data-type={k} checked />
+            <span class="w-7 h-7 rounded-full grid place-items-center shrink-0" style={`background:${JENIS_TITIK[k].color}; transform:rotate(-45deg);`}>
+              <i data-lucide={JENIS_TITIK[k].icon} class="w-3.5 h-3.5 text-white" style="transform:rotate(45deg);"></i>
             </span>
-            <span class="font-medium text-sm">{item.label}</span>
-            <span class="ml-auto text-sm text-muted">{item.count}</span>
+            <span class="font-medium text-sm">{JENIS_TITIK[k].label}</span>
+            <span class="ml-auto text-sm text-muted tabular-nums">{counts[k]}</span>
           </label>
         ))}
       </div>
+      <hr class="my-3 border-line" />
+      <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-sand cursor-pointer">
+        <input type="checkbox" id="toggle-batas" class="w-4 h-4 rounded text-accent" checked />
+        <span class="w-7 h-0 shrink-0 rounded-full" style="border-top:3px solid #166534;"></span>
+        <span class="font-medium text-sm">Batas Wilayah Desa</span>
+      </label>
       <hr class="my-4 border-line" />
       <button id="resetView" class="inline-flex items-center gap-2 w-full justify-center border-2 border-primary text-primary font-heading font-semibold py-2.5 rounded-lg hover:bg-primary hover:text-white transition-colors min-h-[44px] text-sm">
         <i data-lucide="locate-fixed" class="w-5 h-5"></i> Pusatkan ke Desa
@@ -85,32 +89,57 @@ const finalCounts = titikList.length > 0
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-<script define:vars={{ finalJson }}>
+<script define:vars={{ finalJson, configJson, batasJson }}>
   const CENTER = [-6.7022, 107.7414], ZOOM = 13;
   const map = L.map('peta-map', { scrollWheelZoom: false }).setView(CENTER, ZOOM);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
   map.on('focus', () => map.scrollWheelZoom.enable());
   map.on('blur', () => map.scrollWheelZoom.disable());
 
-  const COLORS = { wisata: '#0D9488', umkm: '#15803D', potensi: '#B45309' };
-  const LINK = { wisata: '/wisata/', umkm: '/umkm/', potensi: '/potensi' };
+  // ── Batas wilayah desa (dari shapefile resmi Sindangsari.shp, WGS84) ──
+  const batasLayer = L.geoJSON(JSON.parse(batasJson), {
+    style: { color: '#166534', weight: 3, opacity: 0.9, fillColor: '#166534', fillOpacity: 0.06 },
+    interactive: false,
+  }).addTo(map);
+  const BATAS_BOUNDS = batasLayer.getBounds();
+  map.fitBounds(BATAS_BOUNDS, { padding: [24, 24] });
 
+  const CFG = JSON.parse(configJson);
   const points = JSON.parse(finalJson);
-  const layers = { wisata: L.layerGroup(), umkm: L.layerGroup(), potensi: L.layerGroup() };
+
+  // Label pin berasal dari input admin dan masuk ke HTML popup — escape agar
+  // tidak jadi celah stored XSS.
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+
+  // Basis tautan: '/wisata/' (prefix + slug), '/potensi' (datar), '' (tanpa detail).
+  const hrefFor = (cfg, slug) => {
+    if (!cfg.link) return null;
+    return cfg.link.endsWith('/') ? cfg.link + slug : cfg.link;
+  };
+
+  const layers = {};
+  Object.keys(CFG).forEach(k => { layers[k] = L.layerGroup(); });
 
   points.forEach(p => {
-    const color = COLORS[p.jenis] ?? '#666';
+    const cfg = CFG[p.jenis] || { color: '#666', link: '', label: p.jenis };
     const icon = L.divIcon({
       className: '',
-      html: `<div style="width:24px;height:24px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.3);"></div>`,
+      html: `<div style="width:24px;height:24px;background:${cfg.color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.3);"></div>`,
       iconSize: [24, 24],
       iconAnchor: [12, 24],
       popupAnchor: [0, -26]
     });
-    const href = p.jenis === 'potensi' ? '/potensi' : (LINK[p.jenis] ?? '/') + p.linked_slug;
+    const href = hrefFor(cfg, p.linked_slug);
+    const judul = `<h3 style="font-family:Lexend,sans-serif;font-weight:700;color:#166534;margin:0 0 4px">${esc(p.label)}</h3>`;
+    const popup = href
+      ? `${judul}<p style="margin:0 0 6px;color:#475569;font-size:.85rem">${esc(p.desc)}</p><a href="${href}" style="color:#059669;font-weight:600;font-size:.85rem">Lihat detail →</a>`
+      : `${judul}<p style="margin:0;color:#475569;font-size:.85rem">${esc(cfg.label)}</p>`;
+    if (!layers[p.jenis]) layers[p.jenis] = L.layerGroup();
     L.marker([p.lat, p.lng], { icon, title: p.label })
-      .bindPopup(`<h3 style="font-family:Lexend,sans-serif;font-weight:700;color:#166534;margin:0 0 4px">${p.label}</h3><p style="margin:0 0 6px;color:#475569;font-size:.85rem">${p.desc ?? ''}</p><a href="${href}" style="color:#059669;font-weight:600;font-size:.85rem">Lihat detail →</a>`)
-      .addTo(layers[p.jenis] ?? layers.wisata);
+      .bindPopup(popup)
+      .addTo(layers[p.jenis]);
   });
 
   Object.values(layers).forEach(l => l.addTo(map));
@@ -118,11 +147,17 @@ const finalCounts = titikList.length > 0
   document.querySelectorAll('.filter-check').forEach(cb => {
     cb.addEventListener('change', () => {
       const t = cb.dataset.type;
+      if (!layers[t]) return;
       cb.checked ? layers[t].addTo(map) : map.removeLayer(layers[t]);
     });
   });
 
-  document.getElementById('resetView').addEventListener('click', () => map.setView(CENTER, ZOOM));
+  document.getElementById('resetView').addEventListener('click', () => map.fitBounds(BATAS_BOUNDS, { padding: [24, 24] }));
+
+  // Toggle tampilan garis batas desa.
+  document.getElementById('toggle-batas').addEventListener('change', (e) => {
+    e.target.checked ? batasLayer.addTo(map) : map.removeLayer(batasLayer);
+  });
 
   setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 150);
 </script>

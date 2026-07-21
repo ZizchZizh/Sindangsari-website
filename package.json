@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "astro build && wrangler dev",
-    "db:setup": "wrangler d1 execute web-desa-sindangsari-db --local --file=migrations/0001_schema.sql && wrangler d1 execute web-desa-sindangsari-db --local --file=migrations/0002_seed.sql && wrangler d1 execute web-desa-sindangsari-db --local --file=migrations/0003_layanan.sql && wrangler d1 execute web-desa-sindangsari-db --local --file=migrations/0004_cover_media.sql && wrangler d1 execute web-desa-sindangsari-db --local --file=migrations/0005_layanan_poster.sql",
-    "db:migrate:remote": "wrangler d1 execute web-desa-sindangsari-db --remote --file=migrations/0003_layanan.sql && wrangler d1 execute web-desa-sindangsari-db --remote --file=migrations/0004_cover_media.sql && wrangler d1 execute web-desa-sindangsari-db --remote --file=migrations/0005_layanan_poster.sql",
+    "db:setup": "wrangler d1 execute web-desa-sindangsari-db --local --file=migrations/0001_schema.sql && wrangler d1 execute web-desa-sindangsari-db --local --file=migrations/0002_seed.sql && wrangler d1 execute web-desa-sindangsari-db --local --file=migrations/0003_layanan.sql && wrangler d1 execute web-desa-sindangsari-db --local --file=migrations/0004_cover_media.sql && wrangler d1 execute web-desa-sindangsari-db --local --file=migrations/0005_layanan_poster.sql && wrangler d1 execute web-desa-sindangsari-db --local --file=migrations/0006_demografi.sql && wrangler d1 execute web-desa-sindangsari-db --local --file=migrations/0007_seed_fasilitas.sql",
+    "db:migrate:remote": "wrangler d1 execute web-desa-sindangsari-db --remote --file=migrations/0003_layanan.sql && wrangler d1 execute web-desa-sindangsari-db --remote --file=migrations/0004_cover_media.sql && wrangler d1 execute web-desa-sindangsari-db --remote --file=migrations/0005_layanan_poster.sql && wrangler d1 execute web-desa-sindangsari-db --remote --file=migrations/0006_demografi.sql && wrangler d1 execute web-desa-sindangsari-db --remote --file=migrations/0007_seed_fasilitas.sql",
     "build": "astro build",
     "astro": "astro",
     "deploy": "astro build && wrangler deploy"

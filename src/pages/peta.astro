@@ -96,7 +96,7 @@ const batasJson = JSON.stringify(batasDesa);
   map.on('focus', () => map.scrollWheelZoom.enable());
   map.on('blur', () => map.scrollWheelZoom.disable());
 
-  // ── Batas wilayah desa (dari shapefile resmi Sindangsari.shp, WGS84) ──
+  // ── Batas wilayah desa (dari shapefile resmi Export_Output.shp, WGS84) ──
   const batasLayer = L.geoJSON(JSON.parse(batasJson), {
     style: { color: '#166534', weight: 3, opacity: 0.9, fillColor: '#166534', fillOpacity: 0.06 },
     interactive: false,
